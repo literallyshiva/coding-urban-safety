@@ -7,7 +7,9 @@ export PATH="$HOME/flutter/bin:$PATH"
 
 flutter config --enable-web
 
-flutter create . --platforms web
+if [ ! -d "web" ]; then
+  flutter create . --platforms web
+fi
 
 flutter pub get
 

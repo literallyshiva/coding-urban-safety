@@ -6,5 +6,9 @@ git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutt
 export PATH="$HOME/flutter/bin:$PATH"
 
 flutter config --enable-web
+
+flutter create . --platforms web
+
 flutter pub get
+
 flutter build web --release

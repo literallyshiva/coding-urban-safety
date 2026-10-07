@@ -1,0 +1,23 @@
+name: coding_urban_safety
+description: Mobile-first urban design field research application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.13.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.15.0
+  cloud_firestore: ^6.10.0
+  google_maps_flutter: ^2.18.2
+  geolocator: ^14.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

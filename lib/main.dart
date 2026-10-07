@@ -6,7 +6,17 @@ import 'state/assessment_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+  options: const FirebaseOptions(
+    apiKey: 'AIzaSyC5NzPNqRKB5AvIMS10VpmcLCl21pwLug0',
+    authDomain: 'coding-urban-safety.firebaseapp.com',
+    projectId: 'coding-urban-safety',
+    storageBucket: 'coding-urban-safety.firebasestorage.app',
+    messagingSenderId: '517797655079',
+    appId: '1:517797655079:web:3a2e5b1af72feea64b1402',
+    measurementId: 'G-0Q26VGG928',
+  ),
+);
   runApp(const CodingUrbanSafetyApp());
 }
 

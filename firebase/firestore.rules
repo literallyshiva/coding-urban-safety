@@ -4,13 +4,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function validLocation(point) {
-      return point is latlng
-        && point.latitude >= -90
-        && point.latitude <= 90
-        && point.longitude >= -180
-        && point.longitude <= 180;
-    }
+function validLocation(point) {
+  return point is latlng;
+}
 
     function validAnswers(data) {
       return data.safety_rating is int

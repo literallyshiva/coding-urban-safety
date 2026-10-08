@@ -3,6 +3,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AssessmentState extends ChangeNotifier {
   LatLng? location;
+  String? contributedLocationId;
+  String locationSource = 'gps';
+  void selectPlace(LatLng point, {String? placeId, String source = 'manual'}) {
+    location = point; contributedLocationId = placeId; locationSource = source; notifyListeners();
+  }
   int? safetyRating;
   final List<String> unsafeConditions = [];
   final List<String> placeExperience = [];
@@ -68,6 +73,8 @@ class AssessmentState extends ChangeNotifier {
 
   void reset() {
     location = null;
+    contributedLocationId = null;
+    locationSource = 'gps';
     safetyRating = null;
     unsafeConditions.clear();
     placeExperience.clear();

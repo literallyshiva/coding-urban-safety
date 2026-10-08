@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -22,13 +23,17 @@ class _MapPageState extends State<MapPage> {
   );
 
   GoogleMapController? _mapController;
-  bool _loadingLocation = true;
+  bool _loadingLocation = false;
   String? _locationError;
+  bool _manualMode = false;
+  bool _existingMode = false;
+  LatLng? _selected;
+  String? _placeId;
 
   @override
   void initState() {
     super.initState();
-    _captureCurrentLocation();
+    // GPS is optional; map selection works without location permission.
   }
 
   Future<void> _captureCurrentLocation() async {
@@ -60,7 +65,11 @@ class _MapPageState extends State<MapPage> {
         locationSettings: settings,
       );
       final location = LatLng(position.latitude, position.longitude);
-      widget.assessmentState.setLocation(location);
+      if (!_manualMode && !_existingMode) {
+        _selected = location;
+        _placeId = null;
+        widget.assessmentState.selectPlace(location, source: 'gps');
+      }
 
       if (mounted) {
         setState(() => _loadingLocation = false);
@@ -80,7 +89,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _assessPlace() async {
-    await _captureCurrentLocation();
+    if (!_manualMode && !_existingMode) {
+      await _captureCurrentLocation();
+    } else if (_selected != null) {
+      widget.assessmentState.selectPlace(_selected!, placeId: _placeId, source: _existingMode ? 'existing' : 'manual');
+    }
     if (!mounted || widget.assessmentState.location == null) return;
 
     Navigator.of(context).push(
@@ -94,7 +107,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final location = widget.assessmentState.location;
+    final location = _selected;
 
     return Scaffold(
       appBar: AppBar(title: const Text('CODING URBAN SAFETY')),
@@ -110,7 +123,10 @@ class _MapPageState extends State<MapPage> {
                 controller.animateCamera(CameraUpdate.newLatLngZoom(location, 17));
               }
             },
-            myLocationEnabled: location != null,
+            myLocationEnabled: !_manualMode && !_existingMode && location != null,
+            onTap: (point) {
+              if (_manualMode) setState(() { _selected = point; _placeId = null; });
+            },
             myLocationButtonEnabled: true,
             zoomControlsEnabled: false,
             markers: location == null
@@ -124,9 +140,37 @@ class _MapPageState extends State<MapPage> {
                   },
           ),
           Positioned(
+            left: 16, right: 16, top: 12,
+            child: SafeArea(child: Material(color: Colors.white, borderRadius: BorderRadius.circular(12), child: Column(children: [
+              Wrap(spacing: 5, children: [
+                ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
+                ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
+                ChoiceChip(label: const Text('Existing places'), selected: _existingMode, onSelected: (_) => setState(() { _manualMode = false; _existingMode = true; _selected = null; _placeId = null; })),
+              ]),
+              if (_existingMode) SizedBox(height: 180, child: StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(
+                stream: FirebaseFirestore.instance.collection('places').limit(100).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) return const Text('Unable to load places. Check Firestore rules.');
+                  if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                  if (snapshot.data!.docs.isEmpty) return const Center(child: Text('No contributed places yet.'));
+                  return ListView.builder(itemCount: snapshot.data!.docs.length, itemBuilder: (context, index) {
+                    final doc = snapshot.data!.docs[index];
+                    final point = doc.data()['location'];
+                    if (point is! GeoPoint) return const SizedBox.shrink();
+                    final pos = LatLng(point.latitude, point.longitude);
+                    return ListTile(dense: true, selected: _placeId == doc.id, title: Text('Place ${index+1}'), subtitle: Text('${point.latitude.toStringAsFixed(5)}, ${point.longitude.toStringAsFixed(5)}'), onTap: () {
+                      setState(() { _selected = pos; _placeId = doc.id; });
+                      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(pos, 17));
+                    });
+                  });
+                },
+              )),
+            ]))),
+          ),
+          Positioned(
             left: 16,
             right: 16,
-            top: 16,
+            top: _existingMode ? 260 : 85,
             child: SafeArea(
               bottom: false,
               child: Material(
@@ -144,9 +188,9 @@ class _MapPageState extends State<MapPage> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          _loadingLocation
+                          (!_manualMode && !_existingMode && _loadingLocation)
                               ? 'Finding your current location…'
-                              : _locationError ?? 'Current location captured. Choose this place when you are ready.',
+                              : (_manualMode ? 'Tap the map to contribute a new place.' : _existingMode ? 'Select a contributed place from the list.' : (_locationError ?? 'Choose this place when ready.')),
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -170,10 +214,8 @@ class _MapPageState extends State<MapPage> {
               top: false,
               child: PrimaryActionButton(
                 label: 'ASSESS A PLACE',
-                loading: _loadingLocation,
-                onPressed: location == null && _locationError != null
-                    ? null
-                    : _assessPlace,
+                loading: !_manualMode && !_existingMode && _loadingLocation,
+                onPressed: (_manualMode || _existingMode) && location == null ? null : _assessPlace,
               ),
             ),
           ),

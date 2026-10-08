@@ -1,11 +1,122 @@
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Research prototype: unauthenticated participants may only create assessments.
-    // Tighten these rules before any public production deployment.
-    match /assessments/{assessmentId} {
+
+function validLocation(point) {
+      return point is latlng;
+    }
+
+    function validAnswers(data) {
+      return data.safety_rating is int
+        && data.safety_rating >= 1
+        && data.safety_rating <= 5
+
+        && data.ludic_rating is int
+        && data.ludic_rating >= 1
+        && data.ludic_rating <= 5
+
+        && data.unsafe_conditions is list
+        && data.unsafe_conditions.size() <= 8
+        && data.unsafe_conditions.hasOnly([
+          "Poor lighting",
+          "Poor visibility",
+          "Isolated / few people",
+          "Lack of activity",
+          "Difficult pedestrian movement",
+          "Traffic conflict",
+          "Poor maintenance",
+          "Inactive / blank edges"
+        ])
+
+        && data.place_experience is list
+        && data.place_experience.size() <= 6
+        && data.place_experience.hasOnly([
+          "Move through",
+          "Stay / spend time",
+          "Interact with people",
+          "Choose different routes",
+          "Explore the area",
+          "Discover something new"
+        ])
+
+        && data.spatial_conditions is list
+        && data.spatial_conditions.size() <= 10
+        && data.spatial_conditions.hasOnly([
+          "Good visibility",
+          "Active edges / frontages",
+          "Good pedestrian connectivity",
+          "Multiple route choices",
+          "Presence of people / activity",
+          "Comfortable walking space",
+          "Adequate lighting",
+          "Places to sit / stay",
+          "Clear entrances and exits",
+          "Interesting spatial elements"
+        ])
+
+        && data.ludic_qualities is list
+        && data.ludic_qualities.size() <= 8
+        && data.ludic_qualities.hasOnly([
+          "Curiosity",
+          "Discovery",
+          "Interaction",
+          "Playfulness",
+          "Mystery",
+          "Choice",
+          "Spontaneity",
+          "Variety"
+        ])
+
+        && data.design_responses is list
+        && data.design_responses.size() <= 12
+        && data.design_responses.hasOnly([
+          "Improve lighting",
+          "Improve visibility / sightlines",
+          "Activate blank edges / frontages",
+          "Improve pedestrian paths",
+          "Create safer crossings",
+          "Add places to sit and stay",
+          "Introduce more activities",
+          "Create opportunities for interaction",
+          "Provide alternative routes / choices",
+          "Add playful or interactive elements",
+          "Improve maintenance and cleanliness",
+          "Add landscape / shade / comfort"
+        ])
+
+        && data.spend_more_time in [
+          'YES', 'MAYBE', 'NO'
+        ]
+
+        && data.other_suggestion is string
+        && data.other_suggestion.size() <= 1000;
+    }
+
+    match /places/{placeId} {
+
+      allow get, list: if true;
+
       allow create: if
         request.resource.data.keys().hasOnly([
+          'location', 'created_at'
+        ])
+        && request.resource.data.keys().hasAll([
+          'location', 'created_at'
+        ])
+        && validLocation(request.resource.data.location)
+        && request.resource.data.created_at == request.time;
+
+      allow update, delete: if false;
+    }
+
+    match /assessments/{assessmentId} {
+
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          'place_id',
+          'location_source',
           'location',
           'safety_rating',
           'unsafe_conditions',
@@ -17,22 +128,44 @@ service cloud.firestore {
           'design_responses',
           'other_suggestion',
           'created_at'
-        ]) &&
-        request.resource.data.location is latlng &&
-        request.resource.data.safety_rating is int &&
-        request.resource.data.safety_rating >= 1 &&
-        request.resource.data.safety_rating <= 5 &&
-        request.resource.data.unsafe_conditions is list &&
-        request.resource.data.place_experience is list &&
-        request.resource.data.spend_more_time is string &&
-        request.resource.data.spatial_conditions is list &&
-        request.resource.data.ludic_qualities is list &&
-        request.resource.data.ludic_rating is int &&
-        request.resource.data.ludic_rating >= 1 &&
-        request.resource.data.ludic_rating <= 5 &&
-        request.resource.data.design_responses is list &&
-        request.resource.data.other_suggestion is string &&
-        request.resource.data.created_at == request.time;
+        ])
+
+        && request.resource.data.keys().hasAll([
+          'place_id',
+          'location_source',
+          'location',
+          'safety_rating',
+          'unsafe_conditions',
+          'place_experience',
+          'spend_more_time',
+          'spatial_conditions',
+          'ludic_qualities',
+          'ludic_rating',
+          'design_responses',
+          'other_suggestion',
+          'created_at'
+        ])
+
+        && request.resource.data.place_id is string
+        && request.resource.data.place_id.size() > 0
+
+        && request.resource.data.location_source in [
+          'gps', 'manual', 'existing'
+        ]
+
+        && validLocation(request.resource.data.location)
+
+        && exists(
+          /databases/$(database)/documents/places/$(request.resource.data.place_id)
+        )
+
+        && get(
+          /databases/$(database)/documents/places/$(request.resource.data.place_id)
+        ).data.location == request.resource.data.location
+
+        && validAnswers(request.resource.data)
+
+        && request.resource.data.created_at == request.time;
 
       allow read, update, delete: if false;
     }

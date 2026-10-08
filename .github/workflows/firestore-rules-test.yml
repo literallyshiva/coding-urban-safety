@@ -23,10 +23,14 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install Firebase tools
-        run: npm install -g firebase-tools
-
-      - name: Check Firestore rules file
+      - name: Install test dependencies
         run: |
-          test -f firebase/firestore.rules
-          echo "Firestore rules file found"
+          npm install --no-save firebase@12 @firebase/rules-unit-testing@5 firebase-tools@14
+
+      - name: Run Firestore emulator tests
+        run: |
+          npx firebase emulators:exec \
+            --project demo-urban-safety-tests \
+            --config firebase/firebase.json \
+            --only firestore \
+            "node firebase/tests/firestore.rules.test.cjs"

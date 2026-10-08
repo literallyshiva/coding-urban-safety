@@ -124,6 +124,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               controller: _otherController,
               minLines: 4,
               maxLines: 7,
+              maxLength: 1000,
               textCapitalization: TextCapitalization.sentences,
               onChanged: state.setOtherSuggestion,
               decoration: const InputDecoration(

@@ -5,8 +5,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
 function validLocation(point) {
-  return point is latlng;
-}
+      return point is latlng;
+    }
 
     function validAnswers(data) {
       return data.safety_rating is int
@@ -19,18 +19,72 @@ function validLocation(point) {
 
         && data.unsafe_conditions is list
         && data.unsafe_conditions.size() <= 8
+        && data.unsafe_conditions.hasOnly([
+          "Poor lighting",
+          "Poor visibility",
+          "Isolated / few people",
+          "Lack of activity",
+          "Difficult pedestrian movement",
+          "Traffic conflict",
+          "Poor maintenance",
+          "Inactive / blank edges"
+        ])
 
         && data.place_experience is list
         && data.place_experience.size() <= 6
+        && data.place_experience.hasOnly([
+          "Move through",
+          "Stay / spend time",
+          "Interact with people",
+          "Choose different routes",
+          "Explore the area",
+          "Discover something new"
+        ])
 
         && data.spatial_conditions is list
         && data.spatial_conditions.size() <= 10
+        && data.spatial_conditions.hasOnly([
+          "Good visibility",
+          "Active edges / frontages",
+          "Good pedestrian connectivity",
+          "Multiple route choices",
+          "Presence of people / activity",
+          "Comfortable walking space",
+          "Adequate lighting",
+          "Places to sit / stay",
+          "Clear entrances and exits",
+          "Interesting spatial elements"
+        ])
 
         && data.ludic_qualities is list
         && data.ludic_qualities.size() <= 8
+        && data.ludic_qualities.hasOnly([
+          "Curiosity",
+          "Discovery",
+          "Interaction",
+          "Playfulness",
+          "Mystery",
+          "Choice",
+          "Spontaneity",
+          "Variety"
+        ])
 
         && data.design_responses is list
         && data.design_responses.size() <= 12
+        && data.design_responses.hasOnly([
+          "Improve lighting",
+          "Improve visibility / sightlines",
+          "Activate blank edges / frontages",
+          "Improve pedestrian paths",
+          "Create safer crossings",
+          "Add places to sit and stay",
+          "Introduce more activities",
+          "Create opportunities for interaction",
+          "Provide alternative routes / choices",
+          "Add playful or interactive elements",
+          "Improve maintenance and cleanliness",
+          "Add landscape / shade / comfort"
+        ])
 
         && data.spend_more_time in [
           'YES', 'MAYBE', 'NO'

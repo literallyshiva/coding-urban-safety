@@ -95,6 +95,55 @@ async function main() {
     ));
     console.log('PASS: Reject unexpected field');
 
+    // Exact answer choices are enforced, not just list sizes.
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-unsafe-option'),
+      { ...validAssessment, unsafe_conditions: ['Not a real option'] },
+    ));
+    console.log('PASS: Reject unrecognized unsafe-condition option');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-experience-option'),
+      { ...validAssessment, place_experience: ['Fake experience'] },
+    ));
+    console.log('PASS: Reject unrecognized experience option');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-spatial-option'),
+      { ...validAssessment, spatial_conditions: ['Fake spatial condition'] },
+    ));
+    console.log('PASS: Reject unrecognized spatial option');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-ludic-option'),
+      { ...validAssessment, ludic_qualities: ['Fake ludic quality'] },
+    ));
+    console.log('PASS: Reject unrecognized ludic option');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-design-option'),
+      { ...validAssessment, design_responses: ['Fake design response'] },
+    ));
+    console.log('PASS: Reject unrecognized design option');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'invalid-spend-more-time'),
+      { ...validAssessment, spend_more_time: 'yes' },
+    ));
+    console.log('PASS: Reject invalid spend-more-time value');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'wrong-location'),
+      { ...validAssessment, location: new GeoPoint(8.5242, 76.9366) },
+    ));
+    console.log('PASS: Reject mismatched place coordinates');
+
+    await assertSucceeds(setDoc(
+      doc(db, 'assessments', 'second-valid-review'),
+      { ...validAssessment, location_source: 'existing' },
+    ));
+    console.log('PASS: Accept second assessment for existing place');
+
     console.log('ALL FIRESTORE SECURITY TESTS PASSED');
   } finally {
     await env.cleanup();

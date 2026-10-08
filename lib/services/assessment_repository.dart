@@ -28,7 +28,17 @@ class AssessmentRepository {
       throw StateError('Ludic rating is required.');
     }
 
+    String? placeId = state.contributedLocationId;
+    if (placeId == null) {
+      final place = await _firestore.collection('places').add({
+        'location': GeoPoint(location.latitude, location.longitude),
+        'created_at': FieldValue.serverTimestamp(),
+      });
+      placeId = place.id;
+    }
     return _firestore.collection('assessments').add({
+      'place_id': placeId,
+      'location_source': state.locationSource,
       'location': GeoPoint(location.latitude, location.longitude),
       'safety_rating': safetyRating,
       'unsafe_conditions': List<String>.from(state.unsafeConditions),

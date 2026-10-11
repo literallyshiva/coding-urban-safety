@@ -1,9 +1,10 @@
+
 import 'package:flutter/material.dart';
 
 import '../services/assessment_repository.dart';
 import '../state/assessment_state.dart';
 import '../widgets/research_scaffold.dart';
-import 'map_page.dart';
+import 'thank_you_page.dart';
 
 class DesignResponsePage extends StatefulWidget {
   const DesignResponsePage({super.key, required this.assessmentState});
@@ -49,59 +50,54 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
   }
 
   Future<void> _submit() async {
+    if (_submitting) return;
+
     FocusScope.of(context).unfocus();
     widget.assessmentState.setOtherSuggestion(_otherController.text);
 
     setState(() => _submitting = true);
+
     try {
+      // Save the assessment to Firestore first.
       await _repository.submit(widget.assessmentState);
+
       if (!mounted) return;
 
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Assessment submitted successfully.'),
-          content: const Text(
-            'Your place assessment has been saved as a new research record.',
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('ASSESS ANOTHER PLACE'),
-            ),
-          ],
-        ),
-      );
-
+      // Clear the previous answers only after a successful save.
       widget.assessmentState.reset();
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
+
+      // Replace the questionnaire with the Thank You screen.
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => MapPage(assessmentState: widget.assessmentState),
+          builder: (_) => ThankYouPage(
+            assessmentState: widget.assessmentState,
+          ),
         ),
-        (route) => route.isFirst,
       );
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not submit assessment: $e')),
+        SnackBar(
+          content: Text('Could not submit assessment: $e'),
+        ),
       );
     } finally {
-      if (mounted) setState(() => _submitting = false);
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = widget.assessmentState;
+
     return ResearchScaffold(
       bottomButton: PrimaryActionButton(
         label: 'SUBMIT ASSESSMENT',
         loading: _submitting,
-        onPressed: _submit,
+        onPressed: _submitting ? null : _submit,
       ),
       child: AnimatedBuilder(
         animation: state,

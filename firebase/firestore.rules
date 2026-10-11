@@ -108,10 +108,10 @@ service cloud.firestore {
     // Replace with your verified Firebase Authentication researcher email
     // BEFORE enabling the dashboard. This is intentionally not configured.
     function isResearcher() {
-      return request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email == 'REPLACE_WITH_RESEARCHER_EMAIL';
-    }
+  return request.auth != null
+    && request.auth.token.email_verified == true
+    && request.auth.token.email == 'shivanand.t120@gmail.com';
+}
 
     match /places/{placeId} {
 

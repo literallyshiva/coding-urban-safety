@@ -2,6 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AssessmentState extends ChangeNotifier {
+    String? gender;
+
+  void setGender(String value) {
+    gender = value;
+    notifyListeners();
+  }
   LatLng? location;
   String? contributedLocationId;
   String locationSource = 'gps';
@@ -72,6 +78,7 @@ class AssessmentState extends ChangeNotifier {
   }
 
   void reset() {
+    gender = null;
     location = null;
     contributedLocationId = null;
     locationSource = 'gps';

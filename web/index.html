@@ -13,7 +13,32 @@
 
   <title>CODING URBAN SAFETY</title>
 
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzjiwexF_ADxxxpPrqGqtO5QV2srq7z9k"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=places&amp;key=AIzaSyAzjiwexF_ADxxxpPrqGqtO5QV2srq7z9k"></script>
+  <script>
+    // Uses Places API (New). Enable Places API (New) in the Maps project.
+    window.urbanSafetySearchPlaces = async function (query) {
+      const {AutocompleteSuggestion, AutocompleteSessionToken} =
+          await google.maps.importLibrary('places');
+      const token = new AutocompleteSessionToken();
+      window.urbanSafetySearchToken = token;
+      const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: query, sessionToken: token
+      });
+      return response.suggestions.filter(x => x.placePrediction).map(x => ({
+        id: x.placePrediction.placeId,
+        text: x.placePrediction.text.toString()
+      }));
+    };
+    window.urbanSafetyResolvePlace = async function (id) {
+      const {Place} = await google.maps.importLibrary('places');
+      const place = new Place({id});
+      await place.fetchFields({fields: ['location', 'displayName'],
+        sessionToken: window.urbanSafetySearchToken});
+      if (!place.location) throw new Error('No coordinates returned for place');
+      return {lat: place.location.lat(), lng: place.location.lng(),
+        name: place.displayName || ''};
+    };
+  </script>
 </head>
 
 <body>

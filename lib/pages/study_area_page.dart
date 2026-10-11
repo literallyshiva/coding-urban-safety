@@ -109,6 +109,15 @@ class StudyAreaPage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    
+_GenderChoice(
+  label: 'Other',
+  icon: Icons.person_outline,
+  selected: assessmentState.gender == 'Other',
+  onTap: () {
+    assessmentState.setGender('Other');
+  },
+),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: assessmentState.gender == null

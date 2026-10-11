@@ -57,15 +57,25 @@ async function main() {
       created_at: serverTimestamp(),
     };
 
-    const assessmentRef = doc(db, 'assessments', 'test-assessment-001');
+    const assessmentRef = doc(
+      db,
+      'assessments',
+      'test-assessment-001',
+    );
 
-    await assertSucceeds(setDoc(assessmentRef, validAssessment));
+    await assertSucceeds(setDoc(
+      assessmentRef,
+      validAssessment,
+    ));
     console.log('PASS: Create linked assessment');
 
     await assertFails(getDoc(assessmentRef));
     console.log('PASS: Deny public assessment read');
 
-    await assertFails(updateDoc(assessmentRef, { safety_rating: 1 }));
+    await assertFails(updateDoc(
+      assessmentRef,
+      { safety_rating: 1 },
+    ));
     console.log('PASS: Deny assessment update');
 
     await assertFails(deleteDoc(assessmentRef));
@@ -73,76 +83,181 @@ async function main() {
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-place'),
-      { ...validAssessment, place_id: 'nonexistent-place' },
+      {
+        ...validAssessment,
+        place_id: 'nonexistent-place',
+      },
     ));
     console.log('PASS: Reject nonexistent place');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-rating'),
-      { ...validAssessment, safety_rating: 6 },
+      {
+        ...validAssessment,
+        safety_rating: 6,
+      },
     ));
     console.log('PASS: Reject invalid rating');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'oversized-text'),
-      { ...validAssessment, other_suggestion: 'x'.repeat(1001) },
+      {
+        ...validAssessment,
+        other_suggestion: 'x'.repeat(1001),
+      },
     ));
     console.log('PASS: Reject oversized text');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'extra-field'),
-      { ...validAssessment, unexpected_field: true },
+      {
+        ...validAssessment,
+        unexpected_field: true,
+      },
     ));
     console.log('PASS: Reject unexpected field');
 
-    // Exact answer choices are enforced, not just list sizes.
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-unsafe-option'),
-      { ...validAssessment, unsafe_conditions: ['Not a real option'] },
+      {
+        ...validAssessment,
+        unsafe_conditions: ['Not a real option'],
+      },
     ));
     console.log('PASS: Reject unrecognized unsafe-condition option');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-experience-option'),
-      { ...validAssessment, place_experience: ['Fake experience'] },
+      {
+        ...validAssessment,
+        place_experience: ['Fake experience'],
+      },
     ));
     console.log('PASS: Reject unrecognized experience option');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-spatial-option'),
-      { ...validAssessment, spatial_conditions: ['Fake spatial condition'] },
+      {
+        ...validAssessment,
+        spatial_conditions: ['Fake spatial condition'],
+      },
     ));
     console.log('PASS: Reject unrecognized spatial option');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-ludic-option'),
-      { ...validAssessment, ludic_qualities: ['Fake ludic quality'] },
+      {
+        ...validAssessment,
+        ludic_qualities: ['Fake ludic quality'],
+      },
     ));
     console.log('PASS: Reject unrecognized ludic option');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-design-option'),
-      { ...validAssessment, design_responses: ['Fake design response'] },
+      {
+        ...validAssessment,
+        design_responses: ['Fake design response'],
+      },
     ));
     console.log('PASS: Reject unrecognized design option');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-spend-more-time'),
-      { ...validAssessment, spend_more_time: 'yes' },
+      {
+        ...validAssessment,
+        spend_more_time: 'yes',
+      },
     ));
     console.log('PASS: Reject invalid spend-more-time value');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'wrong-location'),
-      { ...validAssessment, location: new GeoPoint(8.5242, 76.9366) },
+      {
+        ...validAssessment,
+        location: new GeoPoint(8.5242, 76.9366),
+      },
     ));
     console.log('PASS: Reject mismatched place coordinates');
 
     await assertSucceeds(setDoc(
       doc(db, 'assessments', 'second-valid-review'),
-      { ...validAssessment, location_source: 'existing' },
+      {
+        ...validAssessment,
+        location_source: 'existing',
+      },
     ));
     console.log('PASS: Accept second assessment for existing place');
+
+    // Optional gender: accepted values
+    for (const gender of ['Male', 'Female', 'Other']) {
+      await assertSucceeds(setDoc(
+        doc(
+          db,
+          'assessments',
+          `valid-gender-${gender.toLowerCase()}`,
+        ),
+        {
+          ...validAssessment,
+          gender,
+        },
+      ));
+      console.log(`PASS: Accept gender ${gender}`);
+    }
+
+    // Gender may be omitted entirely.
+    await assertSucceeds(setDoc(
+      doc(db, 'assessments', 'gender-not-provided'),
+      {
+        ...validAssessment,
+      },
+    ));
+    console.log('PASS: Accept assessment without gender');
+
+    // Invalid gender values must be rejected.
+    const invalidGenders = [
+      'Unknown',
+      'male',
+      '',
+      123,
+      true,
+      null,
+      ['Male'],
+    ];
+
+    for (let i = 0; i < invalidGenders.length; i++) {
+      await assertFails(setDoc(
+        doc(db, 'assessments', `invalid-gender-${i}`),
+        {
+          ...validAssessment,
+          gender: invalidGenders[i],
+        },
+      ));
+      console.log(
+        `PASS: Reject invalid gender ${i + 1}`,
+      );
+    }
+
+    // A valid gender does not bypass other security checks.
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'gender-invalid-rating'),
+      {
+        ...validAssessment,
+        gender: 'Female',
+        safety_rating: 6,
+      },
+    ));
+    console.log('PASS: Reject invalid rating with gender');
+
+    await assertFails(setDoc(
+      doc(db, 'assessments', 'gender-extra-field'),
+      {
+        ...validAssessment,
+        gender: 'Other',
+        unexpected_field: true,
+      },
+    ));
+    console.log('PASS: Reject extra field with gender');
 
     console.log('ALL FIRESTORE SECURITY TESTS PASSED');
   } finally {

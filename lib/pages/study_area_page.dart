@@ -114,7 +114,7 @@ class StudyAreaPage extends StatelessWidget {
                       onPressed: assessmentState.gender == null
                           ? null
                           : () {
-                              assessmentState.setGender('');
+                              assessmentState.setGender(null);
                             },
                       child: const Text('Clear selection'),
                     ),

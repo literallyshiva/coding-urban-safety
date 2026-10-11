@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class AssessmentState extends ChangeNotifier {
     String? gender;
 
-  void setGender(String value) {
+  void setGender(String? value) {
     gender = value;
     notifyListeners();
   }

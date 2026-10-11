@@ -105,38 +105,68 @@ service cloud.firestore {
         && validGender(data);
     }
 
-    // Replace with your verified Firebase Authentication researcher email
-    // BEFORE enabling the dashboard. This is intentionally not configured.
+    // Only this verified Google account can read assessments.
     function isResearcher() {
-  return request.auth != null
-    && request.auth.token.email_verified == true
-    && request.auth.token.email == 'shivanand.t120@gmail.com';
-}
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'shivanand.t120@gmail.com';
+    }
 
     match /places/{placeId} {
 
+      // Existing places remain visible to participants.
       allow get, list: if true;
 
-      // New places MUST be created atomically with their first assessment.
+      // Temporary compatibility:
+      // v1 creates a place before its assessment.
+      // v2 creates both documents in one atomic batch.
       allow create: if
-        request.resource.data.keys().hasOnly([
-          'location', 'created_at', 'assessment_id'
-        ])
-        && request.resource.data.keys().hasAll([
-          'location', 'created_at', 'assessment_id'
-        ])
-        && validLocation(request.resource.data.location)
+        validLocation(request.resource.data.location)
         && request.resource.data.created_at == request.time
-        && request.resource.data.assessment_id is string
-        && existsAfter(
-          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
-        )
-        && getAfter(
-          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
-        ).data.place_id == placeId
-        && getAfter(
-          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
-        ).data.location == request.resource.data.location;
+        && (
+
+          // v1: Legacy production submission.
+          (
+            request.resource.data.keys().hasOnly([
+              'location',
+              'created_at'
+            ])
+            && request.resource.data.keys().hasAll([
+              'location',
+              'created_at'
+            ])
+          )
+
+          ||
+
+          // v2: Atomic place and assessment submission.
+          (
+            request.resource.data.keys().hasOnly([
+              'location',
+              'created_at',
+              'assessment_id'
+            ])
+            && request.resource.data.keys().hasAll([
+              'location',
+              'created_at',
+              'assessment_id'
+            ])
+            && request.resource.data.assessment_id is string
+            && request.resource.data.assessment_id.size() > 0
+
+            && existsAfter(
+              /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+            )
+
+            && getAfter(
+              /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+            ).data.place_id == placeId
+
+            && getAfter(
+              /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+            ).data.location == request.resource.data.location
+          )
+        );
 
       allow update, delete: if false;
     }
@@ -181,11 +211,14 @@ service cloud.firestore {
         && request.resource.data.place_id.size() > 0
 
         && request.resource.data.location_source in [
-          'gps', 'manual', 'existing'
+          'gps',
+          'manual',
+          'existing'
         ]
 
         && validLocation(request.resource.data.location)
 
+        // Works with existing places and v2 atomic batches.
         && existsAfter(
           /databases/$(database)/documents/places/$(request.resource.data.place_id)
         )
@@ -198,7 +231,10 @@ service cloud.firestore {
 
         && request.resource.data.created_at == request.time;
 
+      // Only the authorized researcher can read responses.
       allow read: if isResearcher();
+
+      // Submitted research data cannot be modified by clients.
       allow update, delete: if false;
     }
   }

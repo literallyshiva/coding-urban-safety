@@ -37,8 +37,8 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF5B4BDB);
-    const background = Color(0xFFF6F6FA);
+    const primary = Color(0xFF647C77);
+    const background = Color(0xFFF6F4EF);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -55,9 +55,9 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           centerTitle: false,
           elevation: 0,
           backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF24212F),
+          foregroundColor: Color(0xFF202A30),
           titleTextStyle: TextStyle(
-            color: Color(0xFF24212F),
+            color: Color(0xFF202A30),
             fontSize: 17,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.4,
@@ -68,28 +68,28 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
             fontSize: 28,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.2,
-            color: Color(0xFF24212F),
+            color: Color(0xFF202A30),
           ),
           titleLarge: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF24212F),
+            color: Color(0xFF202A30),
           ),
           bodyLarge: TextStyle(
             fontSize: 16,
             height: 1.5,
-            color: Color(0xFF4C4858),
+            color: Color(0xFF53615D),
           ),
         ),
         chipTheme: ChipThemeData(
           backgroundColor: Colors.white,
           selectedColor: primary.withValues(alpha: 0.14),
-          side: const BorderSide(color: Color(0xFFD8D5E3)),
+          side: const BorderSide(color: Color(0xFFDCDDD6)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(8),
           ),
           labelStyle: const TextStyle(
-            color: Color(0xFF383346),
+            color: Color(0xFF202A30),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -97,15 +97,15 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFD8D5E3)),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFDCDDD6)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFD8D5E3)),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFDCDDD6)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: primary, width: 1.5),
           ),
           contentPadding: const EdgeInsets.all(16),

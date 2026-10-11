@@ -6,11 +6,13 @@ class ResearchScaffold extends StatelessWidget {
     required this.child,
     this.bottomButton,
     this.appBarTitle = 'CODING URBAN SAFETY',
+    this.showFieldNote = true,
   });
 
   final Widget child;
   final Widget? bottomButton;
   final String appBarTitle;
+  final bool showFieldNote;
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +23,19 @@ class ResearchScaffold extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 720),
-                    child: child,
+                    child: showFieldNote ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(width: 44, height: 2,
+                          color: const Color(0xFFD2A27B)),
+                        const SizedBox(height: 20),
+                        child,
+                      ],
+                    ) : child,
                   ),
                 ),
               ),
@@ -37,7 +47,7 @@ class ResearchScaffold extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   border: Border(
-                    top: BorderSide(color: Color(0xFFE9E7EF)),
+                    top: BorderSide(color: Color(0xFFDCDDD6)),
                   ),
                 ),
                 child: SafeArea(top: false, child: bottomButton!),
@@ -70,7 +80,7 @@ class PrimaryActionButton extends StatelessWidget {
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
           ),
           textStyle: const TextStyle(
             fontSize: 15,

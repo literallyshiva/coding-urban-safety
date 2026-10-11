@@ -19,8 +19,8 @@ class SafetyAssessmentPage extends StatefulWidget {
 }
 
 class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
-  static const navy = Color(0xFF183153);
-  static const teal = Color(0xFF087F8C);
+  static const navy = Color(0xFF202A30);
+  static const teal = Color(0xFF647C77);
 
   static const unsafeOptions = [
     'Poor lighting',
@@ -88,13 +88,13 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
             ),
             decoration: BoxDecoration(
               color: selected
-                  ? const Color(0xFFE6F5F2)
+                  ? const Color(0xFFECEFEA)
                   : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: selected
                     ? teal
-                    : const Color(0xFFE0E2E8),
+                    : const Color(0xFFDCDDD6),
                 width: selected ? 2 : 1,
               ),
             ),
@@ -104,7 +104,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   ratingIcons[rating - 1],
                   color: selected
                       ? teal
-                      : const Color(0xFF8290A0),
+                      : const Color(0xFF82908A),
                   size: 30,
                 ),
                 const SizedBox(height: 9),
@@ -170,7 +170,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 child: const LinearProgressIndicator(
                   value: 0.2,
                   minHeight: 6,
-                  backgroundColor: Color(0xFFE4E7ED),
+                  backgroundColor: Color(0xFFE3E5DF),
                   valueColor:
                       AlwaysStoppedAnimation<Color>(teal),
                 ),
@@ -195,7 +195,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 'Choose the feeling that best describes '
                 'this place.',
                 style: TextStyle(
-                  color: Color(0xFF667589),
+                  color: Color(0xFF667570),
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -219,14 +219,14 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   Text(
                     'Very Unsafe',
                     style: TextStyle(
-                      color: Color(0xFF667589),
+                      color: Color(0xFF667570),
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     'Very Safe',
                     style: TextStyle(
-                      color: Color(0xFF667589),
+                      color: Color(0xFF667570),
                       fontSize: 12,
                     ),
                   ),
@@ -239,7 +239,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE6F5F2),
+                    color: const Color(0xFFECEFEA),
                     borderRadius:
                         BorderRadius.circular(16),
                   ),
@@ -257,7 +257,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                       const Text(
                         'Your selected safety rating',
                         style: TextStyle(
-                          color: Color(0xFF667589),
+                          color: Color(0xFF667570),
                           fontSize: 12,
                         ),
                       ),
@@ -269,7 +269,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
               const SizedBox(height: 36),
 
               const Divider(
-                color: Color(0xFFE2E5EB),
+                color: Color(0xFFDCDDD6),
               ),
 
               const SizedBox(height: 24),
@@ -301,7 +301,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
               const Text(
                 'Select all that apply, or leave blank.',
                 style: TextStyle(
-                  color: Color(0xFF667589),
+                  color: Color(0xFF667570),
                   fontSize: 14,
                 ),
               ),
@@ -323,7 +323,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                     showCheckmark: selected,
                     checkmarkColor: teal,
                     selectedColor:
-                        const Color(0xFFE6F5F2),
+                        const Color(0xFFECEFEA),
                     backgroundColor: Colors.white,
                     side: BorderSide(
                       color: selected

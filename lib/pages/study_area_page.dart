@@ -31,6 +31,14 @@ class StudyAreaPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Row(children: [
+            Icon(Icons.grid_on_outlined, size: 17, color: Color(0xFF647C77)),
+            SizedBox(width: 10),
+            Text('FIELD NOTES  /  02  LOCATION', style: TextStyle(
+              color: Color(0xFF647C77), fontSize: 12,
+              fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+          ]),
+          const SizedBox(height: 22),
           Text(
             'EXPLORE THE STUDY AREA',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -54,10 +62,10 @@ class StudyAreaPage extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5F2),
+                  color: const Color(0xFFECEFEA),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFFB5DDD5),
+                    color: const Color(0xFFCDD8D0),
                   ),
                 ),
                 child: Column(
@@ -67,14 +75,14 @@ class StudyAreaPage extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.people_outline,
-                          color: Color(0xFF087F8C),
+                          color: Color(0xFF647C77),
                         ),
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'ABOUT YOU',
                             style: TextStyle(
-                              color: Color(0xFF183153),
+                              color: Color(0xFF202A30),
                               fontWeight: FontWeight.w800,
                               fontSize: 17,
                             ),
@@ -88,7 +96,7 @@ class StudyAreaPage extends StatelessWidget {
                     const Text(
                       'Gender (optional)',
                       style: TextStyle(
-                        color: Color(0xFF183153),
+                        color: Color(0xFF202A30),
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -194,7 +202,7 @@ class _GenderChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const teal = Color(0xFF087F8C);
+    const teal = Color(0xFF647C77);
 
     return ChoiceChip(
       label: Text(label),
@@ -210,13 +218,13 @@ class _GenderChoice extends StatelessWidget {
       labelStyle: TextStyle(
         color: selected
             ? Colors.white
-            : const Color(0xFF183153),
+            : const Color(0xFF202A30),
         fontWeight: FontWeight.w700,
       ),
       side: BorderSide(
         color: selected
             ? teal
-            : const Color(0xFFB5DDD5),
+            : const Color(0xFFCDD8D0),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -259,7 +267,7 @@ class _InstructionCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: const Color(0xFF087F8C),
+            color: const Color(0xFF647C77),
             size: 24,
           ),
           const SizedBox(width: 14),
@@ -268,7 +276,7 @@ class _InstructionCard extends StatelessWidget {
             number,
             style: const TextStyle(
               fontWeight: FontWeight.w800,
-              color: Color(0xFFF27B67),
+              color: Color(0xFFD2A27B),
             ),
           ),
 

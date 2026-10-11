@@ -13,8 +13,8 @@ class DesignResponsePage extends StatefulWidget {
 }
 
 class _DesignResponsePageState extends State<DesignResponsePage> {
-  static const navy = Color(0xFF183153);
-  static const teal = Color(0xFF087F8C);
+  static const navy = Color(0xFF202A30);
+  static const teal = Color(0xFF647C77);
 
   static const responses = [
     'Improve lighting',
@@ -85,7 +85,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
           children: [
             const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('05 / DESIGN', style: TextStyle(color: teal, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
-              Text('Final step', style: TextStyle(color: Color(0xFF8290A0), fontSize: 12)),
+              Text('Final step', style: TextStyle(color: Color(0xFF82908A), fontSize: 12)),
             ]),
             const SizedBox(height: 14),
             ClipRRect(
@@ -93,14 +93,14 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               child: const LinearProgressIndicator(
                 value: 1.0,
                 minHeight: 6,
-                backgroundColor: Color(0xFFE4E7ED),
+                backgroundColor: Color(0xFFE3E5DF),
                 valueColor: AlwaysStoppedAnimation<Color>(teal),
               ),
             ),
             const SizedBox(height: 32),
             Text('DESIGN RESPONSES', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: navy, fontWeight: FontWeight.w900)),
             const SizedBox(height: 12),
-            const Text('Imagine a better version of this place. What would you change?', style: TextStyle(color: Color(0xFF667589), fontSize: 15, height: 1.5)),
+            const Text('Imagine a better version of this place. What would you change?', style: TextStyle(color: Color(0xFF667570), fontSize: 15, height: 1.5)),
             const SizedBox(height: 30),
             const Row(children: [
               Icon(Icons.tips_and_updates_outlined, color: teal, size: 26),
@@ -108,7 +108,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               Expanded(child: Text('WHAT COULD MAKE THIS PLACE FEEL SAFER AND MORE ENGAGING?', style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w900, height: 1.3))),
             ]),
             const SizedBox(height: 10),
-            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667589), fontSize: 14)),
+            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667570), fontSize: 14)),
             const SizedBox(height: 20),
             LayoutBuilder(builder: (context, constraints) {
               final columns = constraints.maxWidth < 340 ? 1 : 2;
@@ -131,7 +131,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               );
             }),
             const SizedBox(height: 36),
-            const Divider(color: Color(0xFFE2E5EB)),
+            const Divider(color: Color(0xFFDCDDD6)),
             const SizedBox(height: 24),
             const Row(children: [
               Icon(Icons.edit_note_outlined, color: teal, size: 26),
@@ -139,7 +139,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               Text('OTHER SUGGESTION', style: TextStyle(color: navy, fontSize: 18, fontWeight: FontWeight.w900)),
             ]),
             const SizedBox(height: 10),
-            const Text('Optional — tell us something we may have missed.', style: TextStyle(color: Color(0xFF667589), fontSize: 14)),
+            const Text('Optional — tell us something we may have missed.', style: TextStyle(color: Color(0xFF667570), fontSize: 14)),
             const SizedBox(height: 16),
             TextField(
               controller: _otherController,
@@ -151,7 +151,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
               decoration: InputDecoration(
                 hintText: 'Describe what you would change in this place...',
                 filled: true,
-                fillColor: const Color(0xFFFAFAFC),
+                fillColor: const Color(0xFFF6F4EF),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
@@ -172,7 +172,7 @@ class _DesignCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const teal = Color(0xFF087F8C);
+    const teal = Color(0xFF647C77);
     return Semantics(
       button: true,
       selected: selected,
@@ -184,9 +184,9 @@ class _DesignCard extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 116),
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE6F5F2) : const Color(0xFFFAFAFC),
+            color: selected ? const Color(0xFFECEFEA) : const Color(0xFFF6F4EF),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? teal : const Color(0xFFE2E5EB), width: selected ? 2 : 1),
+            border: Border.all(color: selected ? teal : const Color(0xFFDCDDD6), width: selected ? 2 : 1),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -194,7 +194,7 @@ class _DesignCard extends StatelessWidget {
               if (selected) const Icon(Icons.check_circle, color: teal, size: 21),
             ]),
             const SizedBox(height: 14),
-            Text(label, style: const TextStyle(color: Color(0xFF183153), fontSize: 14, fontWeight: FontWeight.w700, height: 1.3)),
+            Text(label, style: const TextStyle(color: Color(0xFF202A30), fontSize: 14, fontWeight: FontWeight.w700, height: 1.3)),
           ]),
         ),
       ),

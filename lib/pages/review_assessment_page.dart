@@ -41,7 +41,7 @@ class _ReviewAssessmentPageState extends State<ReviewAssessmentPage> {
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(fontSize: 13,
-        fontWeight: FontWeight.w800, color: Color(0xFF087F8C))),
+        fontWeight: FontWeight.w800, color: Color(0xFF647C77))),
       const SizedBox(height: 5),
       Text(value, style: const TextStyle(fontSize: 15)),
     ]),

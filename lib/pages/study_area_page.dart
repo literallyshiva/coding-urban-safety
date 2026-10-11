@@ -6,7 +6,10 @@ import '../widgets/research_scaffold.dart';
 import 'map_page.dart';
 
 class StudyAreaPage extends StatelessWidget {
-  const StudyAreaPage({super.key, required this.assessmentState});
+  const StudyAreaPage({
+    super.key,
+    required this.assessmentState,
+  });
 
   final AssessmentState assessmentState;
 
@@ -33,12 +36,14 @@ class StudyAreaPage extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 14),
+
           Text(
             'Every street, park, and public space has a story. '
             'Take a moment to observe your surroundings and '
             'share how the space makes you feel.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
+
           const SizedBox(height: 24),
 
           // Gender selection
@@ -77,7 +82,9 @@ class StudyAreaPage extends StatelessWidget {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 9),
+
                     const Text(
                       'Gender (optional)',
                       style: TextStyle(
@@ -86,7 +93,10 @@ class StudyAreaPage extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+
                     const SizedBox(height: 13),
+
+                    // Male, Female and Other options
                     Wrap(
                       spacing: 12,
                       runSpacing: 10,
@@ -94,31 +104,37 @@ class StudyAreaPage extends StatelessWidget {
                         _GenderChoice(
                           label: 'Male',
                           icon: Icons.male,
-                          selected: assessmentState.gender == 'Male',
+                          selected:
+                              assessmentState.gender == 'Male',
                           onTap: () {
                             assessmentState.setGender('Male');
                           },
                         ),
+
                         _GenderChoice(
                           label: 'Female',
                           icon: Icons.female,
-                          selected: assessmentState.gender == 'Female',
+                          selected:
+                              assessmentState.gender == 'Female',
                           onTap: () {
                             assessmentState.setGender('Female');
                           },
                         ),
+
+                        _GenderChoice(
+                          label: 'Other',
+                          icon: Icons.person_outline,
+                          selected:
+                              assessmentState.gender == 'Other',
+                          onTap: () {
+                            assessmentState.setGender('Other');
+                          },
+                        ),
                       ],
                     ),
-                    
-_GenderChoice(
-  label: 'Other',
-  icon: Icons.person_outline,
-  selected: assessmentState.gender == 'Other',
-  onTap: () {
-    assessmentState.setGender('Other');
-  },
-),
+
                     const SizedBox(height: 8),
+
                     TextButton(
                       onPressed: assessmentState.gender == null
                           ? null
@@ -134,12 +150,14 @@ _GenderChoice(
           ),
 
           const SizedBox(height: 27),
+
           const _InstructionCard(
             number: '01',
             title: 'Walk',
             text: 'Move through the area at a comfortable pace.',
             icon: Icons.directions_walk,
           ),
+
           const _InstructionCard(
             number: '02',
             title: 'Observe',
@@ -147,6 +165,7 @@ _GenderChoice(
                 'and spatial character.',
             icon: Icons.visibility_outlined,
           ),
+
           const _InstructionCard(
             number: '03',
             title: 'Choose',
@@ -159,6 +178,7 @@ _GenderChoice(
   }
 }
 
+// Gender selection chip
 class _GenderChoice extends StatelessWidget {
   const _GenderChoice({
     required this.label,
@@ -188,11 +208,15 @@ class _GenderChoice extends StatelessWidget {
       selectedColor: teal,
       backgroundColor: Colors.white,
       labelStyle: TextStyle(
-        color: selected ? Colors.white : const Color(0xFF183153),
+        color: selected
+            ? Colors.white
+            : const Color(0xFF183153),
         fontWeight: FontWeight.w700,
       ),
       side: BorderSide(
-        color: selected ? teal : const Color(0xFFB5DDD5),
+        color: selected
+            ? teal
+            : const Color(0xFFB5DDD5),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -203,6 +227,7 @@ class _GenderChoice extends StatelessWidget {
   }
 }
 
+// Study area instruction card
 class _InstructionCard extends StatelessWidget {
   const _InstructionCard({
     required this.number,
@@ -238,6 +263,7 @@ class _InstructionCard extends StatelessWidget {
             size: 24,
           ),
           const SizedBox(width: 14),
+
           Text(
             number,
             style: const TextStyle(
@@ -245,7 +271,9 @@ class _InstructionCard extends StatelessWidget {
               color: Color(0xFFF27B67),
             ),
           ),
+
           const SizedBox(width: 14),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

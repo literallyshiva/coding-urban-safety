@@ -53,10 +53,14 @@ class _MapPageState extends State<MapPage> {
       final results = await PlaceSearch.search(query);
       if (mounted) setState(() { _suggestions = results;
         if (results.isEmpty) _searchError = 'No matching places found.'; });
-    } catch (_) {
-      if (mounted) setState(() => _searchError =
-          'Place search unavailable. Enable Places API (New) and check your API key restrictions.');
-    } finally {
+    } catch (e, stackTrace) {
+  debugPrint('Places search failed: $e');
+  debugPrintStack(stackTrace: stackTrace);
+
+  if (mounted) {
+    setState(() => _searchError = 'Place search failed: $e');
+  }
+} finally {
       if (mounted) setState(() => _searching = false);
     }
   }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
@@ -12,198 +11,130 @@ class HomePage extends StatelessWidget {
 
   final AssessmentState assessmentState;
 
-  static const Color navy = Color(0xFF183153);
-  static const Color teal = Color(0xFF087F8C);
-  static const Color coral = Color(0xFFF27B67);
-  static const Color cream = Color(0xFFFFF7E8);
+  static const ivory = Color(0xFFF6F4EF);
+  static const ink = Color(0xFF202A30);
+  static const sage = Color(0xFF647C77);
+  static const clay = Color(0xFFD2A27B);
+  static const line = Color(0xFFDCDDD6);
+
+  void _start(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => StudyAreaPage(assessmentState: assessmentState),
+    ));
+  }
+
+  void _resume(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => assessmentState.location == null
+          ? StudyAreaPage(assessmentState: assessmentState)
+          : SafetyAssessmentPage(assessmentState: assessmentState),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
     return ResearchScaffold(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 9,
-              ),
-              decoration: BoxDecoration(
-                color: teal.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.location_city, color: teal, size: 19),
-                  SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      'AN URBAN EXPLORATION STUDY',
-                      style: TextStyle(
-                        color: teal,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ),
-                ],
+            Row(
+              children: [
+                const Icon(Icons.grid_on_rounded, size: 19, color: sage),
+                const SizedBox(width: 9),
+                const Expanded(
+                  child: Text('FIELD NOTES  /  URBAN RESEARCH',
+                    style: TextStyle(fontSize: 11, letterSpacing: 1.7,
+                      fontWeight: FontWeight.w700, color: sage)),
+                ),
+                IconButton(
+                  tooltip: 'Researcher access',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ResearchDashboardPage())),
+                  icon: const Icon(Icons.lock_outline, size: 20, color: ink),
+                ),
+              ],
+            ),
+            const SizedBox(height: 25),
+            const Text('01  /  INTRODUCTION',
+              style: TextStyle(fontSize: 11, letterSpacing: 2,
+                fontWeight: FontWeight.w700, color: sage)),
+            const SizedBox(height: 13),
+            const Text('How do we\nexperience\nour cities?',
+              style: TextStyle(fontSize: 47, height: 1.06,
+                fontWeight: FontWeight.w500, letterSpacing: -2.0, color: ink)),
+            const SizedBox(height: 20),
+            Container(height: 2, width: 65, color: clay),
+            const SizedBox(height: 21),
+            const Text('A study of safety, movement and playful exploration in public spaces.',
+              style: TextStyle(fontSize: 17, height: 1.55, color: ink)),
+            const SizedBox(height: 27),
+            const _ArchitecturalIllustration(),
+            const SizedBox(height: 24),
+            const Wrap(spacing: 8, runSpacing: 8, children: [
+              _Keyword('01  SAFETY'),
+              _Keyword('02  PUBLIC SPACE'),
+              _Keyword('03  EXPLORATION'),
+            ]),
+            const SizedBox(height: 23),
+            const Text('Every place has a story. Your observations can help us understand how public spaces feel and function.',
+              style: TextStyle(fontSize: 14, height: 1.65, color: ink)),
+            const SizedBox(height: 26),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: ink, foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                onPressed: () => _start(context),
+                child: const Row(mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text('BEGIN THE STUDY',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
+                    SizedBox(width: 13), Icon(Icons.arrow_forward, size: 19)]),
               ),
             ),
             AnimatedBuilder(
               animation: assessmentState,
               builder: (context, _) => assessmentState.hasDraft
-                  ? Padding(padding: const EdgeInsets.only(top: 16),
-                      child: Card(color: const Color(0xFFE8F5F2),
-                        child: Padding(padding: const EdgeInsets.all(12),
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Unfinished assessment saved on this device',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 8),
-                              FilledButton.icon(
-                                icon: const Icon(Icons.restore),
-                                label: const Text('RESUME ASSESSMENT'),
-                                onPressed: () => Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) =>
-                                    assessmentState.location == null
-                                      ? StudyAreaPage(assessmentState: assessmentState)
-                                      : SafetyAssessmentPage(assessmentState: assessmentState))),
-                              ),
-                              TextButton(onPressed: assessmentState.reset,
-                                child: const Text('DISCARD SAVED ANSWERS')),
-                            ],
-                          ),
-                        ),
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: ivory,
+                        border: Border.all(color: line)),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('UNFINISHED FIELD NOTE',
+                            style: TextStyle(color: sage, fontSize: 11,
+                              fontWeight: FontWeight.w700, letterSpacing: 1.5)),
+                          const SizedBox(height: 6),
+                          const Text('Your progress is saved on this device.',
+                            style: TextStyle(color: ink, fontSize: 13)),
+                          const SizedBox(height: 6),
+                          TextButton.icon(onPressed: () => _resume(context),
+                            icon: const Icon(Icons.arrow_forward, size: 18),
+                            label: const Text('RESUME ASSESSMENT')),
+                          TextButton(onPressed: assessmentState.reset,
+                            child: const Text('DISCARD SAVED ANSWERS')),
+                        ],
                       ),
-                    ) : const SizedBox.shrink(),
-            ),
-            Align(alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const ResearchDashboardPage())),
-                icon: const Icon(Icons.lock_outline),
-                label: const Text('Researcher access'),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            const Text(
-              'Every place\nhas a story.',
-              style: TextStyle(
-                fontSize: 43,
-                height: 1.12,
-                fontWeight: FontWeight.w900,
-                color: navy,
-                letterSpacing: -1.4,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Explore your city. Share your experience.',
-              style: TextStyle(
-                color: teal,
-                fontSize: 19,
-                fontWeight: FontWeight.w700,
-                height: 1.35,
-              ),
-            ),
-            const SizedBox(height: 25),
-
-            const _UrbanIllustration(),
-
-            const SizedBox(height: 25),
-            const Text(
-              'How does your city make you feel?',
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.w800,
-                color: navy,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Help us understand safety, comfort, movement, '
-              'and opportunities for playful exploration in '
-              'public spaces. Your observations will support '
-              'urban design research.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    height: 1.55,
-                  ),
-            ),
-            const SizedBox(height: 20),
-
-            const Wrap(
-              spacing: 9,
-              runSpacing: 9,
-              children: [
-                _TopicChip(
-                  icon: Icons.shield_outlined,
-                  label: 'Safety',
-                  color: teal,
-                ),
-                _TopicChip(
-                  icon: Icons.park_outlined,
-                  label: 'Public spaces',
-                  color: Color(0xFF468D57),
-                ),
-                _TopicChip(
-                  icon: Icons.explore_outlined,
-                  label: 'Exploration',
-                  color: coral,
-                ),
-              ],
-            ),
-            const SizedBox(height: 27),
-
-            PrimaryActionButton(
-              label: 'START EXPLORING  →',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => StudyAreaPage(
-                      assessmentState: assessmentState,
                     ),
-                  ),
-                );
-              },
+                  )
+                : const SizedBox.shrink(),
             ),
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 25),
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cream,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFF1E4C9),
-                ),
-              ),
-              child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: const BoxDecoration(border: Border(top: BorderSide(color: line))),
+              child: const Row(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.lock_outline,
-                    color: navy,
-                    size: 20,
-                  ),
+                  Icon(Icons.lock_outline, color: sage, size: 18),
                   SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Research privacy: Information submitted '
-                      'through this study is intended solely for '
-                      'research purposes. Please avoid including '
-                      'names or other identifying details.',
-                      style: TextStyle(
-                        color: navy,
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
+                  Expanded(child: Text(
+                    'RESEARCH PRIVACY  /  Information submitted is intended solely for research purposes. Please avoid names or other identifying details.',
+                    style: TextStyle(fontSize: 12, height: 1.6, color: sage))),
                 ],
               ),
             ),
@@ -214,138 +145,75 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _TopicChip extends StatelessWidget {
-  const _TopicChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  final IconData icon;
+class _Keyword extends StatelessWidget {
+  const _Keyword(this.label);
   final String label;
-  final Color color;
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 9,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.09),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: color.withValues(alpha: 0.18),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 17),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    decoration: BoxDecoration(border: Border.all(color: HomePage.line)),
+    child: Text(label, style: const TextStyle(fontSize: 10,
+      fontWeight: FontWeight.w700, letterSpacing: 1, color: HomePage.sage)),
+  );
 }
 
-class _UrbanIllustration extends StatelessWidget {
-  const _UrbanIllustration();
-
+class _ArchitecturalIllustration extends StatelessWidget {
+  const _ArchitecturalIllustration();
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 225,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5F2),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 18,
-            right: 22,
-            child: Icon(
-              Icons.wb_sunny_rounded,
-              size: 55,
-              color: const Color(0xFFFFC85A),
-            ),
-          ),
-          Positioned(
-            top: 20,
-            left: 22,
-            child: Icon(
-              Icons.auto_awesome,
-              size: 30,
-              color: HomePage.coral,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 44,
-              color: const Color(0xFFB5DDC9),
-            ),
-          ),
-          const Positioned(
-            bottom: 33,
-            left: 14,
-            child: Icon(
-              Icons.apartment_rounded,
-              size: 140,
-              color: Color(0xFF82B5B7),
-            ),
-          ),
-          const Positioned(
-            bottom: 31,
-            right: 8,
-            child: Icon(
-              Icons.location_city_rounded,
-              size: 155,
-              color: HomePage.navy,
-            ),
-          ),
-          const Positioned(
-            bottom: 25,
-            left: 110,
-            child: Icon(
-              Icons.park_rounded,
-              size: 90,
-              color: Color(0xFF468D57),
-            ),
-          ),
-          const Positioned(
-            top: 34,
-            left: 115,
-            child: Icon(
-              Icons.location_on_rounded,
-              size: 53,
-              color: HomePage.coral,
-            ),
-          ),
-          const Positioned(
-            bottom: 8,
-            left: 25,
-            child: Icon(
-              Icons.directions_walk_rounded,
-              size: 43,
-              color: HomePage.navy,
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget build(BuildContext context) => Container(
+    height: 250,
+    width: double.infinity,
+    decoration: BoxDecoration(color: HomePage.ivory,
+      border: Border.all(color: HomePage.line)),
+    child: const CustomPaint(painter: _CityLineDrawing()),
+  );
+}
+
+class _CityLineDrawing extends CustomPainter {
+  const _CityLineDrawing();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final sx = size.width / 360;
+    final sy = size.height / 250;
+    canvas.save();
+    canvas.scale(sx, sy);
+    final pen = Paint()..color = HomePage.ink..style = PaintingStyle.stroke..strokeWidth = 1.5;
+    final faint = Paint()..color = HomePage.sage.withValues(alpha: .45)..style = PaintingStyle.stroke..strokeWidth = 1;
+    final accent = Paint()..color = HomePage.clay..style = PaintingStyle.stroke..strokeWidth = 2;
+    void segment(double x1, double y1, double x2, double y2, Paint p) =>
+      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), p);
+    void rect(double x, double y, double w, double h, Paint p) =>
+      canvas.drawRect(Rect.fromLTWH(x, y, w, h), p);
+    // Architectural elevations: towers, windows, street level.
+    rect(23, 85, 85, 130, pen);
+    rect(119, 40, 105, 175, pen);
+    rect(235, 101, 99, 114, pen);
+    for (var x = 35.0; x < 100; x += 20) {
+      for (var y = 101.0; y < 195; y += 24) rect(x, y, 10, 14, faint);
+    }
+    for (var x = 134.0; x < 215; x += 25) {
+      for (var y = 57.0; y < 186; y += 28) rect(x, y, 13, 17, faint);
+    }
+    for (var x = 248.0; x < 325; x += 23) {
+      for (var y = 117.0; y < 194; y += 25) rect(x, y, 12, 15, faint);
+    }
+    segment(0, 215, 360, 215, pen);
+    segment(0, 231, 360, 231, faint);
+    segment(165, 16, 165, 39, accent);
+    segment(155, 27, 175, 27, accent);
+    // A tree and human-scale markers in the foreground.
+    segment(282, 187, 282, 215, pen);
+    canvas.drawCircle(const Offset(282, 174), 15, pen);
+    canvas.drawCircle(const Offset(272, 180), 12, faint);
+    canvas.drawCircle(const Offset(292, 182), 12, faint);
+    canvas.drawCircle(const Offset(83, 198), 5, accent);
+    segment(83, 203, 83, 218, accent);
+    segment(83, 209, 76, 214, accent);
+    segment(83, 209, 90, 214, accent);
+    segment(83, 218, 78, 227, accent);
+    segment(83, 218, 89, 227, accent);
+    canvas.restore();
   }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

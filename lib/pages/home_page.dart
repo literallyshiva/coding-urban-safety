@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../state/assessment_state.dart';
 import '../widgets/research_scaffold.dart';
 import 'study_area_page.dart';
+import 'safety_assessment_page.dart';
+import 'research_dashboard_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.assessmentState});
@@ -49,6 +51,42 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            AnimatedBuilder(
+              animation: assessmentState,
+              builder: (context, _) => assessmentState.hasDraft
+                  ? Padding(padding: const EdgeInsets.only(top: 16),
+                      child: Card(color: const Color(0xFFE8F5F2),
+                        child: Padding(padding: const EdgeInsets.all(12),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Unfinished assessment saved on this device',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              FilledButton.icon(
+                                icon: const Icon(Icons.restore),
+                                label: const Text('RESUME ASSESSMENT'),
+                                onPressed: () => Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) =>
+                                    assessmentState.location == null
+                                      ? StudyAreaPage(assessmentState: assessmentState)
+                                      : SafetyAssessmentPage(assessmentState: assessmentState))),
+                              ),
+                              TextButton(onPressed: assessmentState.reset,
+                                child: const Text('DISCARD SAVED ANSWERS')),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ) : const SizedBox.shrink(),
+            ),
+            Align(alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const ResearchDashboardPage())),
+                icon: const Icon(Icons.lock_outline),
+                label: const Text('Researcher access'),
               ),
             ),
             const SizedBox(height: 24),

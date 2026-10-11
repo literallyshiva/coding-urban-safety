@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../services/assessment_repository.dart';
 import '../state/assessment_state.dart';
 import '../widgets/research_scaffold.dart';
-import 'thank_you_page.dart';
+import 'review_assessment_page.dart';
 
 class DesignResponsePage extends StatefulWidget {
   const DesignResponsePage({super.key, required this.assessmentState});
@@ -48,8 +47,6 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
   ];
 
   late final TextEditingController _otherController;
-  final AssessmentRepository _repository = AssessmentRepository();
-  bool _submitting = false;
 
   @override
   void initState() {
@@ -63,29 +60,14 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (_submitting) return;
+  void _review() {
     FocusScope.of(context).unfocus();
     widget.assessmentState.setOtherSuggestion(_otherController.text);
-    setState(() => _submitting = true);
-
-    try {
-      await _repository.submit(widget.assessmentState);
-      if (!mounted) return;
-      widget.assessmentState.reset();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => ThankYouPage(assessmentState: widget.assessmentState),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not submit assessment: $e')),
-      );
-    } finally {
-      if (mounted) setState(() => _submitting = false);
-    }
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => ReviewAssessmentPage(
+        assessmentState: widget.assessmentState,
+      ),
+    ));
   }
 
   @override
@@ -93,9 +75,8 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
     final state = widget.assessmentState;
     return ResearchScaffold(
       bottomButton: PrimaryActionButton(
-        label: 'SUBMIT ASSESSMENT',
-        loading: _submitting,
-        onPressed: _submitting ? null : _submit,
+        label: 'REVIEW & SUBMIT',
+        onPressed: _review,
       ),
       child: AnimatedBuilder(
         animation: state,

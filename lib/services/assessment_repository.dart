@@ -36,19 +36,11 @@ class AssessmentRepository {
       throw StateError('Invalid gender selection.');
     }
 
-    String? placeId = state.contributedLocationId;
-
-    if (placeId == null) {
-      final place = await _firestore.collection('places').add({
-        'location': GeoPoint(
-          location.latitude,
-          location.longitude,
-        ),
-        'created_at': FieldValue.serverTimestamp(),
-      });
-
-      placeId = place.id;
-    }
+    final assessmentRef = _firestore.collection('assessments').doc();
+    final placeRef = state.contributedLocationId == null
+        ? _firestore.collection('places').doc()
+        : _firestore.collection('places').doc(state.contributedLocationId);
+    final placeId = placeRef.id;
 
     // Build assessment data.
     final assessmentData = <String, dynamic>{
@@ -81,8 +73,18 @@ class AssessmentRepository {
       assessmentData['gender'] = gender;
     }
 
-    return _firestore
-        .collection('assessments')
-        .add(assessmentData);
+    // Atomic batch: a new place and its first assessment either both
+    // commit or neither commits. Existing places are never rewritten.
+    final batch = _firestore.batch();
+    if (state.contributedLocationId == null) {
+      batch.set(placeRef, {
+        'location': GeoPoint(location.latitude, location.longitude),
+        'created_at': FieldValue.serverTimestamp(),
+        'assessment_id': assessmentRef.id,
+      });
+    }
+    batch.set(assessmentRef, assessmentData);
+    await batch.commit();
+    return assessmentRef;
   }
 }

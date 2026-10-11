@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/home_page.dart';
+import 'services/draft_storage.dart';
 import 'state/assessment_state.dart';
 
 Future<void> main() async {
@@ -17,18 +18,22 @@ Future<void> main() async {
     measurementId: 'G-0Q26VGG928',
   ),
 );
-  runApp(const CodingUrbanSafetyApp());
+  final assessmentState = AssessmentState();
+  await DraftStorage(assessmentState).initialize();
+  runApp(CodingUrbanSafetyApp(assessmentState: assessmentState));
 }
 
 class CodingUrbanSafetyApp extends StatefulWidget {
-  const CodingUrbanSafetyApp({super.key});
+  const CodingUrbanSafetyApp({super.key, required this.assessmentState});
+
+  final AssessmentState assessmentState;
 
   @override
   State<CodingUrbanSafetyApp> createState() => _CodingUrbanSafetyAppState();
 }
 
 class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
-  final AssessmentState assessmentState = AssessmentState();
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +111,7 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           contentPadding: const EdgeInsets.all(16),
         ),
       ),
-      home: HomePage(assessmentState: assessmentState),
+      home: HomePage(assessmentState: widget.assessmentState),
     );
   }
 }

@@ -105,19 +105,38 @@ service cloud.firestore {
         && validGender(data);
     }
 
+    // Replace with your verified Firebase Authentication researcher email
+    // BEFORE enabling the dashboard. This is intentionally not configured.
+    function isResearcher() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'REPLACE_WITH_RESEARCHER_EMAIL';
+    }
+
     match /places/{placeId} {
 
       allow get, list: if true;
 
+      // New places MUST be created atomically with their first assessment.
       allow create: if
         request.resource.data.keys().hasOnly([
-          'location', 'created_at'
+          'location', 'created_at', 'assessment_id'
         ])
         && request.resource.data.keys().hasAll([
-          'location', 'created_at'
+          'location', 'created_at', 'assessment_id'
         ])
         && validLocation(request.resource.data.location)
-        && request.resource.data.created_at == request.time;
+        && request.resource.data.created_at == request.time
+        && request.resource.data.assessment_id is string
+        && existsAfter(
+          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+        )
+        && getAfter(
+          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+        ).data.place_id == placeId
+        && getAfter(
+          /databases/$(database)/documents/assessments/$(request.resource.data.assessment_id)
+        ).data.location == request.resource.data.location;
 
       allow update, delete: if false;
     }
@@ -167,11 +186,11 @@ service cloud.firestore {
 
         && validLocation(request.resource.data.location)
 
-        && exists(
+        && existsAfter(
           /databases/$(database)/documents/places/$(request.resource.data.place_id)
         )
 
-        && get(
+        && getAfter(
           /databases/$(database)/documents/places/$(request.resource.data.place_id)
         ).data.location == request.resource.data.location
 
@@ -179,7 +198,8 @@ service cloud.firestore {
 
         && request.resource.data.created_at == request.time;
 
-      allow read, update, delete: if false;
+      allow read: if isResearcher();
+      allow update, delete: if false;
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../state/assessment_state.dart';
+import '../services/place_search.dart';
 import '../widgets/research_scaffold.dart';
 import 'safety_assessment_page.dart';
 
@@ -29,6 +30,54 @@ class _MapPageState extends State<MapPage> {
   bool _existingMode = false;
   LatLng? _selected;
   String? _placeId;
+  final TextEditingController _searchController = TextEditingController();
+  List<PlaceSuggestion> _suggestions = [];
+  bool _searching = false;
+  String? _searchError;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _searchPlaces() async {
+    final query = _searchController.text.trim();
+    if (query.length < 3) {
+      setState(() => _searchError = 'Enter at least 3 characters.');
+      return;
+    }
+    setState(() { _searching = true; _searchError = null; _suggestions = []; });
+    try {
+      final results = await PlaceSearch.search(query);
+      if (mounted) setState(() { _suggestions = results;
+        if (results.isEmpty) _searchError = 'No matching places found.'; });
+    } catch (_) {
+      if (mounted) setState(() => _searchError =
+          'Place search unavailable. Enable Places API (New) and check your API key restrictions.');
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
+  Future<void> _selectSuggestion(PlaceSuggestion suggestion) async {
+    setState(() { _searching = true; _searchError = null; });
+    try {
+      final point = await PlaceSearch.resolve(suggestion.id);
+      if (!mounted) return;
+      final location = LatLng(point.lat, point.lng);
+      setState(() { _manualMode = true; _existingMode = false;
+        _selected = location; _placeId = null; _suggestions = [];
+        _searchController.text = suggestion.description; });
+      await _mapController?.animateCamera(CameraUpdate.newLatLngZoom(location, 17));
+    } catch (_) {
+      if (mounted) setState(() => _searchError = 'Unable to select this place. Try another result.');
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
 
   @override
   void initState() {
@@ -45,7 +94,7 @@ class _MapPageState extends State<MapPage> {
     try {
       final enabled = await Geolocator.isLocationServiceEnabled();
       if (!enabled) {
-        throw StateError('Location services are disabled on this device.');
+        throw StateError('GPS is turned off. Enable device location, or choose New place to select manually.');
       }
 
       var permission = await Geolocator.checkPermission();
@@ -54,7 +103,9 @@ class _MapPageState extends State<MapPage> {
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        throw StateError('Location permission is required to assess a place.');
+        throw StateError(permission == LocationPermission.deniedForever
+            ? 'Location is blocked. Enable it in browser settings or choose New place.'
+            : 'Location permission denied. Choose New place to select manually.');
       }
 
       const settings = LocationSettings(
@@ -90,6 +141,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _assessPlace() async {
     if (!_manualMode && !_existingMode) {
+      widget.assessmentState.location = null;
       await _captureCurrentLocation();
     } else if (_selected != null) {
       widget.assessmentState.selectPlace(_selected!, placeId: _placeId, source: _existingMode ? 'existing' : 'manual');
@@ -147,6 +199,44 @@ class _MapPageState extends State<MapPage> {
                 ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
                 ChoiceChip(label: const Text('Existing places'), selected: _existingMode, onSelected: (_) => setState(() { _manualMode = false; _existingMode = true; _selected = null; _placeId = null; })),
               ]),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Row(children: [
+                  Expanded(child: TextField(
+                    controller: _searchController,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => _searchPlaces(),
+                    decoration: const InputDecoration(
+                      isDense: true, prefixIcon: Icon(Icons.search),
+                      hintText: 'Search a landmark or address',
+                    ),
+                  )),
+                  const SizedBox(width: 6),
+                  IconButton.filledTonal(
+                    tooltip: 'Search places',
+                    onPressed: _searching ? null : _searchPlaces,
+                    icon: _searching
+                        ? const SizedBox(width: 18, height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.arrow_forward),
+                  ),
+                ]),
+              ),
+              if (_searchError != null)
+                Padding(padding: const EdgeInsets.all(8),
+                  child: Text(_searchError!, style: const TextStyle(color: Colors.red))),
+              if (_suggestions.isNotEmpty)
+                SizedBox(height: 170, child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _suggestions.length,
+                  itemBuilder: (context, index) => ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.place_outlined),
+                    title: Text(_suggestions[index].description,
+                      maxLines: 2, overflow: TextOverflow.ellipsis),
+                    onTap: _searching ? null : () => _selectSuggestion(_suggestions[index]),
+                  ),
+                )),
               if (_existingMode) SizedBox(height: 180, child: StreamBuilder<QuerySnapshot<Map<String,dynamic>>>(
                 stream: FirebaseFirestore.instance.collection('places').limit(100).snapshots(),
                 builder: (context, snapshot) {
@@ -170,7 +260,7 @@ class _MapPageState extends State<MapPage> {
           Positioned(
             left: 16,
             right: 16,
-            top: _existingMode ? 260 : 85,
+            top: _existingMode ? 340 : (_suggestions.isNotEmpty ? 330 : 160),
             child: SafeArea(
               bottom: false,
               child: Material(
@@ -190,10 +280,15 @@ class _MapPageState extends State<MapPage> {
                         child: Text(
                           (!_manualMode && !_existingMode && _loadingLocation)
                               ? 'Finding your current location…'
-                              : (_manualMode ? 'Tap the map to contribute a new place.' : _existingMode ? 'Select a contributed place from the list.' : (_locationError ?? 'Choose this place when ready.')),
+                              : (_manualMode ? 'Tap the map or search above to choose a new place.' : _existingMode ? 'Select a contributed place from the list.' : (_locationError ?? 'Choose this place when ready.')),
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
+                      if (_locationError != null)
+                        TextButton(onPressed: () => setState(() {
+                          _manualMode = true; _existingMode = false;
+                          _locationError = null; _selected = null;
+                        }), child: const Text('Choose on map')),
                       if (_locationError != null)
                         IconButton(
                           onPressed: _captureCurrentLocation,

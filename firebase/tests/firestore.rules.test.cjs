@@ -13,16 +13,22 @@ const {
   deleteDoc,
   GeoPoint,
   serverTimestamp,
+  writeBatch,
+  getDocs,
+  collection,
 } = require('firebase/firestore');
 const fs = require('node:fs');
 
 async function main() {
+  const rulesText = fs.readFileSync('firebase/firestore.rules', 'utf8');
+  const researcherEmail = rulesText.match(/request\.auth\.token\.email == '([^']+)'/)?.[1];
+  if (!researcherEmail) throw new Error('Researcher email not configured in rules.');
   const env = await initializeTestEnvironment({
     projectId: 'demo-urban-safety-tests',
     firestore: {
       host: '127.0.0.1',
       port: 8080,
-      rules: fs.readFileSync('firebase/firestore.rules', 'utf8'),
+      rules: rulesText,
     },
   });
 
@@ -31,15 +37,6 @@ async function main() {
     const location = new GeoPoint(8.5241, 76.9366);
 
     const placeRef = doc(db, 'places', 'test-place-001');
-
-    await assertSucceeds(setDoc(placeRef, {
-      location,
-      created_at: serverTimestamp(),
-    }));
-    console.log('PASS: Create valid place');
-
-    await assertSucceeds(getDoc(placeRef));
-    console.log('PASS: Read contributed place');
 
     const validAssessment = {
       place_id: 'test-place-001',
@@ -63,14 +60,71 @@ async function main() {
       'test-assessment-001',
     );
 
-    await assertSucceeds(setDoc(
-      assessmentRef,
-      validAssessment,
-    ));
+    const initialBatch = writeBatch(db);
+    initialBatch.set(placeRef, {
+      location,
+      created_at: serverTimestamp(),
+      assessment_id: 'test-assessment-001',
+    });
+    initialBatch.set(assessmentRef, validAssessment);
+    await assertSucceeds(initialBatch.commit());
+    console.log('PASS: Atomically create place and first assessment');
+
+    await assertSucceeds(getDoc(placeRef));
+    console.log('PASS: Read contributed place');
+
+    await assertFails(setDoc(doc(db, 'places', 'orphan-place'), {
+      location,
+      created_at: serverTimestamp(),
+      assessment_id: 'nonexistent-assessment',
+    }));
+    console.log('PASS: Reject orphan place');
+
+    await assertFails(setDoc(doc(db, 'places', 'legacy-orphan'), {
+      location,
+      created_at: serverTimestamp(),
+    }));
+    console.log('PASS: Reject legacy standalone place creation');
+
+    const incompleteBatch = writeBatch(db);
+    incompleteBatch.set(doc(db, 'places', 'invalid-batch-place'), {
+      location,
+      created_at: serverTimestamp(),
+      assessment_id: 'invalid-batch-assessment',
+    });
+    incompleteBatch.set(doc(db, 'assessments', 'invalid-batch-assessment'), {
+      ...validAssessment,
+      place_id: 'invalid-batch-place',
+      safety_rating: 9,
+    });
+    await assertFails(incompleteBatch.commit());
+    console.log('PASS: Reject invalid atomic batch');
+
     console.log('PASS: Create linked assessment');
 
     await assertFails(getDoc(assessmentRef));
     console.log('PASS: Deny public assessment read');
+
+    const researcher = env.authenticatedContext('researcher-user', {
+      email: researcherEmail,
+      email_verified: true,
+    }).firestore();
+    await assertSucceeds(getDoc(doc(researcher, 'assessments', 'test-assessment-001')));
+    await assertSucceeds(getDocs(collection(researcher, 'assessments')));
+    console.log('PASS: Verified researcher can read assessments');
+
+    const unverified = env.authenticatedContext('unverified-user', {
+      email: researcherEmail,
+      email_verified: false,
+    }).firestore();
+    await assertFails(getDoc(doc(unverified, 'assessments', 'test-assessment-001')));
+    console.log('PASS: Reject unverified email');
+
+    const outsider = env.authenticatedContext('outsider-user', {
+      email: 'other@example.com', email_verified: true,
+    }).firestore();
+    await assertFails(getDoc(doc(outsider, 'assessments', 'test-assessment-001')));
+    console.log('PASS: Reject unauthorized account');
 
     await assertFails(updateDoc(
       assessmentRef,

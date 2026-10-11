@@ -1,10 +1,12 @@
 
 const assert = require('node:assert/strict');
+
 const {
   initializeTestEnvironment,
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
+
 const {
   doc,
   setDoc,
@@ -17,12 +19,25 @@ const {
   getDocs,
   collection,
 } = require('firebase/firestore');
+
 const fs = require('node:fs');
 
 async function main() {
-  const rulesText = fs.readFileSync('firebase/firestore.rules', 'utf8');
-  const researcherEmail = rulesText.match(/request\.auth\.token\.email == '([^']+)'/)?.[1];
-  if (!researcherEmail) throw new Error('Researcher email not configured in rules.');
+  const rulesText = fs.readFileSync(
+    'firebase/firestore.rules',
+    'utf8',
+  );
+
+  const researcherEmail = rulesText.match(
+    /request\.auth\.token\.email == '([^']+)'/,
+  )?.[1];
+
+  if (!researcherEmail) {
+    throw new Error(
+      'Researcher email not configured in rules.',
+    );
+  }
+
   const env = await initializeTestEnvironment({
     projectId: 'demo-urban-safety-tests',
     firestore: {
@@ -34,9 +49,20 @@ async function main() {
 
   try {
     const db = env.unauthenticatedContext().firestore();
+
     const location = new GeoPoint(8.5241, 76.9366);
 
-    const placeRef = doc(db, 'places', 'test-place-001');
+    const placeRef = doc(
+      db,
+      'places',
+      'test-place-001',
+    );
+
+    const assessmentRef = doc(
+      db,
+      'assessments',
+      'test-assessment-001',
+    );
 
     const validAssessment = {
       place_id: 'test-place-001',
@@ -54,86 +80,255 @@ async function main() {
       created_at: serverTimestamp(),
     };
 
-    const assessmentRef = doc(
-      db,
-      'assessments',
-      'test-assessment-001',
-    );
+    // ==========================================
+    // TEST 1: V2 ATOMIC SUBMISSION
+    // ==========================================
 
     const initialBatch = writeBatch(db);
+
     initialBatch.set(placeRef, {
       location,
       created_at: serverTimestamp(),
       assessment_id: 'test-assessment-001',
     });
-    initialBatch.set(assessmentRef, validAssessment);
+
+    initialBatch.set(
+      assessmentRef,
+      validAssessment,
+    );
+
     await assertSucceeds(initialBatch.commit());
-    console.log('PASS: Atomically create place and first assessment');
+
+    console.log(
+      'PASS: v2 atomic place and assessment creation',
+    );
+
+    // ==========================================
+    // TEST 2: PUBLIC PLACE READ
+    // ==========================================
 
     await assertSucceeds(getDoc(placeRef));
-    console.log('PASS: Read contributed place');
 
-    await assertFails(setDoc(doc(db, 'places', 'orphan-place'), {
-      location,
-      created_at: serverTimestamp(),
-      assessment_id: 'nonexistent-assessment',
-    }));
-    console.log('PASS: Reject orphan place');
+    console.log('PASS: Public place read');
 
-    await assertFails(setDoc(doc(db, 'places', 'legacy-orphan'), {
-      location,
-      created_at: serverTimestamp(),
-    }));
-    console.log('PASS: Reject legacy standalone place creation');
+    // ==========================================
+    // TEST 3: REJECT ORPHAN V2 PLACE
+    // ==========================================
+
+    await assertFails(setDoc(
+      doc(db, 'places', 'orphan-place'),
+      {
+        location,
+        created_at: serverTimestamp(),
+        assessment_id: 'nonexistent-assessment',
+      },
+    ));
+
+    console.log('PASS: Reject orphan v2 place');
+
+    // ==========================================
+    // TEST 4: V1 LEGACY PLACE CREATION
+    // ==========================================
+
+    const legacyPlaceRef = doc(
+      db,
+      'places',
+      'legacy-place',
+    );
+
+    await assertSucceeds(setDoc(
+      legacyPlaceRef,
+      {
+        location,
+        created_at: serverTimestamp(),
+      },
+    ));
+
+    console.log('PASS: v1 standalone place creation');
+
+    // ==========================================
+    // TEST 5: V1 LEGACY ASSESSMENT
+    // ==========================================
+
+    await assertSucceeds(setDoc(
+      doc(db, 'assessments', 'legacy-assessment'),
+      {
+        ...validAssessment,
+        place_id: 'legacy-place',
+      },
+    ));
+
+    console.log('PASS: v1 assessment creation');
+
+    // ==========================================
+    // TEST 6: INVALID LEGACY PLACE
+    // ==========================================
+
+    await assertFails(setDoc(
+      doc(db, 'places', 'invalid-legacy-place'),
+      {
+        location,
+        created_at: serverTimestamp(),
+        unexpected_field: true,
+      },
+    ));
+
+    console.log('PASS: Reject invalid legacy place');
+
+    // ==========================================
+    // TEST 7: INVALID ATOMIC BATCH
+    // ==========================================
 
     const incompleteBatch = writeBatch(db);
-    incompleteBatch.set(doc(db, 'places', 'invalid-batch-place'), {
-      location,
-      created_at: serverTimestamp(),
-      assessment_id: 'invalid-batch-assessment',
-    });
-    incompleteBatch.set(doc(db, 'assessments', 'invalid-batch-assessment'), {
-      ...validAssessment,
-      place_id: 'invalid-batch-place',
-      safety_rating: 9,
-    });
+
+    incompleteBatch.set(
+      doc(db, 'places', 'invalid-batch-place'),
+      {
+        location,
+        created_at: serverTimestamp(),
+        assessment_id: 'invalid-batch-assessment',
+      },
+    );
+
+    incompleteBatch.set(
+      doc(db, 'assessments', 'invalid-batch-assessment'),
+      {
+        ...validAssessment,
+        place_id: 'invalid-batch-place',
+        safety_rating: 9,
+      },
+    );
+
     await assertFails(incompleteBatch.commit());
+
     console.log('PASS: Reject invalid atomic batch');
 
-    console.log('PASS: Create linked assessment');
+    // ==========================================
+    // TEST 8: DENY PUBLIC ASSESSMENT READ
+    // ==========================================
 
     await assertFails(getDoc(assessmentRef));
-    console.log('PASS: Deny public assessment read');
 
-    const researcher = env.authenticatedContext('researcher-user', {
-      email: researcherEmail,
-      email_verified: true,
-    }).firestore();
-    await assertSucceeds(getDoc(doc(researcher, 'assessments', 'test-assessment-001')));
-    await assertSucceeds(getDocs(collection(researcher, 'assessments')));
-    console.log('PASS: Verified researcher can read assessments');
+    await assertFails(
+      getDocs(collection(db, 'assessments')),
+    );
 
-    const unverified = env.authenticatedContext('unverified-user', {
-      email: researcherEmail,
-      email_verified: false,
-    }).firestore();
-    await assertFails(getDoc(doc(unverified, 'assessments', 'test-assessment-001')));
+    console.log('PASS: Deny public assessment reads');
+
+    // ==========================================
+    // TEST 9: AUTHORIZED RESEARCHER
+    // ==========================================
+
+    const researcher = env.authenticatedContext(
+      'researcher-user',
+      {
+        email: researcherEmail,
+        email_verified: true,
+      },
+    ).firestore();
+
+    await assertSucceeds(getDoc(
+      doc(
+        researcher,
+        'assessments',
+        'test-assessment-001',
+      ),
+    ));
+
+    await assertSucceeds(
+      getDocs(collection(researcher, 'assessments')),
+    );
+
+    console.log(
+      'PASS: Verified researcher can read assessments',
+    );
+
+    // ==========================================
+    // TEST 10: UNVERIFIED RESEARCHER
+    // ==========================================
+
+    const unverified = env.authenticatedContext(
+      'unverified-user',
+      {
+        email: researcherEmail,
+        email_verified: false,
+      },
+    ).firestore();
+
+    await assertFails(getDoc(
+      doc(
+        unverified,
+        'assessments',
+        'test-assessment-001',
+      ),
+    ));
+
     console.log('PASS: Reject unverified email');
 
-    const outsider = env.authenticatedContext('outsider-user', {
-      email: 'other@example.com', email_verified: true,
-    }).firestore();
-    await assertFails(getDoc(doc(outsider, 'assessments', 'test-assessment-001')));
+    // ==========================================
+    // TEST 11: UNAUTHORIZED ACCOUNT
+    // ==========================================
+
+    const outsider = env.authenticatedContext(
+      'outsider-user',
+      {
+        email: 'other@example.com',
+        email_verified: true,
+      },
+    ).firestore();
+
+    await assertFails(getDoc(
+      doc(
+        outsider,
+        'assessments',
+        'test-assessment-001',
+      ),
+    ));
+
+    await assertFails(
+      getDocs(collection(outsider, 'assessments')),
+    );
+
     console.log('PASS: Reject unauthorized account');
+
+    // ==========================================
+    // TEST 12: DENY ASSESSMENT MODIFICATIONS
+    // ==========================================
 
     await assertFails(updateDoc(
       assessmentRef,
       { safety_rating: 1 },
     ));
-    console.log('PASS: Deny assessment update');
 
     await assertFails(deleteDoc(assessmentRef));
-    console.log('PASS: Deny assessment deletion');
+
+    console.log(
+      'PASS: Reject assessment updates and deletions',
+    );
+
+    // ==========================================
+    // TEST 13: DENY PLACE MODIFICATIONS
+    // ==========================================
+
+    await assertFails(updateDoc(
+      placeRef,
+      {
+        location: new GeoPoint(
+          8.5242,
+          76.9366,
+        ),
+      },
+    ));
+
+    await assertFails(deleteDoc(placeRef));
+
+    console.log(
+      'PASS: Reject place updates and deletions',
+    );
+
+    // ==========================================
+    // TEST 14: NONEXISTENT PLACE
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-place'),
@@ -142,7 +337,12 @@ async function main() {
         place_id: 'nonexistent-place',
       },
     ));
+
     console.log('PASS: Reject nonexistent place');
+
+    // ==========================================
+    // TEST 15: INVALID RATING
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-rating'),
@@ -151,7 +351,12 @@ async function main() {
         safety_rating: 6,
       },
     ));
+
     console.log('PASS: Reject invalid rating');
+
+    // ==========================================
+    // TEST 16: OVERSIZED TEXT
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'oversized-text'),
@@ -160,7 +365,12 @@ async function main() {
         other_suggestion: 'x'.repeat(1001),
       },
     ));
+
     console.log('PASS: Reject oversized text');
+
+    // ==========================================
+    // TEST 17: EXTRA FIELD
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'extra-field'),
@@ -169,7 +379,12 @@ async function main() {
         unexpected_field: true,
       },
     ));
+
     console.log('PASS: Reject unexpected field');
+
+    // ==========================================
+    // TEST 18: INVALID UNSAFE CONDITION
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-unsafe-option'),
@@ -178,7 +393,14 @@ async function main() {
         unsafe_conditions: ['Not a real option'],
       },
     ));
-    console.log('PASS: Reject unrecognized unsafe-condition option');
+
+    console.log(
+      'PASS: Reject unrecognized unsafe condition',
+    );
+
+    // ==========================================
+    // TEST 19: INVALID PLACE EXPERIENCE
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-experience-option'),
@@ -187,7 +409,14 @@ async function main() {
         place_experience: ['Fake experience'],
       },
     ));
-    console.log('PASS: Reject unrecognized experience option');
+
+    console.log(
+      'PASS: Reject unrecognized place experience',
+    );
+
+    // ==========================================
+    // TEST 20: INVALID SPATIAL CONDITION
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-spatial-option'),
@@ -196,7 +425,14 @@ async function main() {
         spatial_conditions: ['Fake spatial condition'],
       },
     ));
-    console.log('PASS: Reject unrecognized spatial option');
+
+    console.log(
+      'PASS: Reject unrecognized spatial condition',
+    );
+
+    // ==========================================
+    // TEST 21: INVALID LUDIC QUALITY
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-ludic-option'),
@@ -205,7 +441,14 @@ async function main() {
         ludic_qualities: ['Fake ludic quality'],
       },
     ));
-    console.log('PASS: Reject unrecognized ludic option');
+
+    console.log(
+      'PASS: Reject unrecognized ludic quality',
+    );
+
+    // ==========================================
+    // TEST 22: INVALID DESIGN RESPONSE
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-design-option'),
@@ -214,7 +457,14 @@ async function main() {
         design_responses: ['Fake design response'],
       },
     ));
-    console.log('PASS: Reject unrecognized design option');
+
+    console.log(
+      'PASS: Reject unrecognized design response',
+    );
+
+    // ==========================================
+    // TEST 23: INVALID SPEND-MORE-TIME
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'invalid-spend-more-time'),
@@ -223,16 +473,31 @@ async function main() {
         spend_more_time: 'yes',
       },
     ));
-    console.log('PASS: Reject invalid spend-more-time value');
+
+    console.log(
+      'PASS: Reject invalid spend-more-time value',
+    );
+
+    // ==========================================
+    // TEST 24: WRONG LOCATION
+    // ==========================================
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'wrong-location'),
       {
         ...validAssessment,
-        location: new GeoPoint(8.5242, 76.9366),
+        location: new GeoPoint(
+          8.5242,
+          76.9366,
+        ),
       },
     ));
-    console.log('PASS: Reject mismatched place coordinates');
+
+    console.log('PASS: Reject mismatched coordinates');
+
+    // ==========================================
+    // TEST 25: SECOND ASSESSMENT
+    // ==========================================
 
     await assertSucceeds(setDoc(
       doc(db, 'assessments', 'second-valid-review'),
@@ -241,10 +506,20 @@ async function main() {
         location_source: 'existing',
       },
     ));
-    console.log('PASS: Accept second assessment for existing place');
 
-    // Optional gender: accepted values
-    for (const gender of ['Male', 'Female', 'Other']) {
+    console.log(
+      'PASS: Accept second assessment for existing place',
+    );
+
+    // ==========================================
+    // TEST 26: VALID GENDER OPTIONS
+    // ==========================================
+
+    for (const gender of [
+      'Male',
+      'Female',
+      'Other',
+    ]) {
       await assertSucceeds(setDoc(
         doc(
           db,
@@ -256,19 +531,31 @@ async function main() {
           gender,
         },
       ));
-      console.log(`PASS: Accept gender ${gender}`);
+
+      console.log(
+        `PASS: Accept gender ${gender}`,
+      );
     }
 
-    // Gender may be omitted entirely.
+    // ==========================================
+    // TEST 27: OPTIONAL GENDER
+    // ==========================================
+
     await assertSucceeds(setDoc(
       doc(db, 'assessments', 'gender-not-provided'),
       {
         ...validAssessment,
       },
     ));
-    console.log('PASS: Accept assessment without gender');
 
-    // Invalid gender values must be rejected.
+    console.log(
+      'PASS: Accept assessment without gender',
+    );
+
+    // ==========================================
+    // TEST 28: INVALID GENDER OPTIONS
+    // ==========================================
+
     const invalidGenders = [
       'Unknown',
       'male',
@@ -281,18 +568,26 @@ async function main() {
 
     for (let i = 0; i < invalidGenders.length; i++) {
       await assertFails(setDoc(
-        doc(db, 'assessments', `invalid-gender-${i}`),
+        doc(
+          db,
+          'assessments',
+          `invalid-gender-${i}`,
+        ),
         {
           ...validAssessment,
           gender: invalidGenders[i],
         },
       ));
+
       console.log(
         `PASS: Reject invalid gender ${i + 1}`,
       );
     }
 
-    // A valid gender does not bypass other security checks.
+    // ==========================================
+    // TEST 29: GENDER CANNOT BYPASS VALIDATION
+    // ==========================================
+
     await assertFails(setDoc(
       doc(db, 'assessments', 'gender-invalid-rating'),
       {
@@ -301,7 +596,6 @@ async function main() {
         safety_rating: 6,
       },
     ));
-    console.log('PASS: Reject invalid rating with gender');
 
     await assertFails(setDoc(
       doc(db, 'assessments', 'gender-extra-field'),
@@ -311,15 +605,25 @@ async function main() {
         unexpected_field: true,
       },
     ));
-    console.log('PASS: Reject extra field with gender');
 
-    console.log('ALL FIRESTORE SECURITY TESTS PASSED');
+    console.log(
+      'PASS: Gender cannot bypass security validation',
+    );
+
+    // ==========================================
+    // ALL TESTS COMPLETED
+    // ==========================================
+
+    console.log(
+      'ALL FIRESTORE SECURITY TESTS PASSED',
+    );
+
   } finally {
     await env.cleanup();
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });

@@ -26,9 +26,9 @@ class ThankYouPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const navy = Color(0xFF183153);
-    const teal = Color(0xFF087F8C);
-    const coral = Color(0xFFF27B67);
+    const navy = Color(0xFF202A30);
+    const teal = Color(0xFF647C77);
+    const coral = Color(0xFFD2A27B);
 
     return ResearchScaffold(
       appBarTitle: 'THANK YOU',
@@ -46,7 +46,7 @@ class ThankYouPage extends StatelessWidget {
             width: 220,
             height: 220,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F5F2),
+              color: const Color(0xFFECEFEA),
               borderRadius: BorderRadius.circular(110),
             ),
             child: Stack(
@@ -151,10 +151,10 @@ class ThankYouPage extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF2ED),
+              color: const Color(0xFFF5EEE6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFFFFD8C9),
+                color: const Color(0xFFE9D4C1),
               ),
             ),
             child: const Column(

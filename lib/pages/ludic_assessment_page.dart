@@ -19,8 +19,8 @@ class LudicAssessmentPage extends StatefulWidget {
 }
 
 class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
-  static const navy = Color(0xFF183153);
-  static const teal = Color(0xFF087F8C);
+  static const navy = Color(0xFF202A30);
+  static const teal = Color(0xFF647C77);
 
   static const experienceOptions = [
     'Move through',
@@ -85,13 +85,13 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
         constraints: const BoxConstraints(minHeight: 112),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFFE6F5F2)
-              : const Color(0xFFFAFAFC),
+              ? const Color(0xFFECEFEA)
+              : const Color(0xFFF6F4EF),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected
                 ? teal
-                : const Color(0xFFE2E5EB),
+                : const Color(0xFFDCDDD6),
             width: selected ? 2 : 1,
           ),
         ),
@@ -152,13 +152,13 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
             ),
             decoration: BoxDecoration(
               color: selected
-                  ? const Color(0xFFE6F5F2)
-                  : const Color(0xFFFAFAFC),
+                  ? const Color(0xFFECEFEA)
+                  : const Color(0xFFF6F4EF),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: selected
                     ? teal
-                    : const Color(0xFFE2E5EB),
+                    : const Color(0xFFDCDDD6),
                 width: selected ? 2 : 1,
               ),
             ),
@@ -168,7 +168,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                   spendIcons[index],
                   color: selected
                       ? teal
-                      : const Color(0xFF8290A0),
+                      : const Color(0xFF82908A),
                   size: 28,
                 ),
                 const SizedBox(height: 10),
@@ -216,7 +216,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                 Text(
                   'Your perspective matters',
                   style: TextStyle(
-                    color: Color(0xFF8290A0),
+                    color: Color(0xFF82908A),
                     fontSize: 12,
                   ),
                 ),
@@ -230,7 +230,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
               child: const LinearProgressIndicator(
                 value: 0.4,
                 minHeight: 6,
-                backgroundColor: Color(0xFFE4E7ED),
+                backgroundColor: Color(0xFFE3E5DF),
                 valueColor:
                     AlwaysStoppedAnimation<Color>(teal),
               ),
@@ -255,7 +255,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
               'Tell us how this space invites you to '
               'move, explore and connect.',
               style: TextStyle(
-                color: Color(0xFF667589),
+                color: Color(0xFF667570),
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -290,7 +290,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
             const Text(
               'Select all that apply.',
               style: TextStyle(
-                color: Color(0xFF667589),
+                color: Color(0xFF667570),
                 fontSize: 14,
               ),
             ),
@@ -322,7 +322,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
             const SizedBox(height: 36),
 
             const Divider(
-              color: Color(0xFFE2E5EB),
+              color: Color(0xFFDCDDD6),
             ),
 
             const SizedBox(height: 24),

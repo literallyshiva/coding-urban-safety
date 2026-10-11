@@ -9,8 +9,8 @@ class SpatialAssessmentPage extends StatelessWidget {
 
   final AssessmentState assessmentState;
 
-  static const _navy = Color(0xFF183153);
-  static const _teal = Color(0xFF087F8C);
+  static const _navy = Color(0xFF202A30);
+  static const _teal = Color(0xFF647C77);
 
   static const spatialOptions = [
     'Good visibility',
@@ -60,7 +60,7 @@ class SpatialAssessmentPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('03 / SPATIAL', style: TextStyle(color: _teal, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
-                Text('Your perspective matters', style: TextStyle(color: Color(0xFF8290A0), fontSize: 12)),
+                Text('Your perspective matters', style: TextStyle(color: Color(0xFF82908A), fontSize: 12)),
               ],
             ),
             const SizedBox(height: 14),
@@ -69,14 +69,14 @@ class SpatialAssessmentPage extends StatelessWidget {
               child: const LinearProgressIndicator(
                 value: 0.6,
                 minHeight: 6,
-                backgroundColor: Color(0xFFE4E7ED),
+                backgroundColor: Color(0xFFE3E5DF),
                 valueColor: AlwaysStoppedAnimation<Color>(_teal),
               ),
             ),
             const SizedBox(height: 32),
             Text('SPATIAL CONDITIONS', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: _navy, fontWeight: FontWeight.w900)),
             const SizedBox(height: 12),
-            const Text('Look around. Which features can you notice in this place?', style: TextStyle(color: Color(0xFF667589), fontSize: 15, height: 1.5)),
+            const Text('Look around. Which features can you notice in this place?', style: TextStyle(color: Color(0xFF667570), fontSize: 15, height: 1.5)),
             const SizedBox(height: 30),
             const Row(children: [
               Icon(Icons.map_outlined, color: _teal, size: 26),
@@ -84,7 +84,7 @@ class SpatialAssessmentPage extends StatelessWidget {
               Expanded(child: Text('WHICH SPATIAL CONDITIONS ARE PRESENT HERE?', style: TextStyle(color: _navy, fontSize: 18, fontWeight: FontWeight.w900, height: 1.3))),
             ]),
             const SizedBox(height: 10),
-            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667589), fontSize: 14)),
+            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667570), fontSize: 14)),
             const SizedBox(height: 20),
             LayoutBuilder(builder: (context, constraints) {
               final columns = constraints.maxWidth < 340 ? 1 : 2;
@@ -123,7 +123,7 @@ class _SpatialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const teal = Color(0xFF087F8C);
+    const teal = Color(0xFF647C77);
     return Semantics(
       button: true,
       selected: selected,
@@ -135,9 +135,9 @@ class _SpatialCard extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 116),
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE6F5F2) : const Color(0xFFFAFAFC),
+            color: selected ? const Color(0xFFECEFEA) : const Color(0xFFF6F4EF),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? teal : const Color(0xFFE2E5EB), width: selected ? 2 : 1),
+            border: Border.all(color: selected ? teal : const Color(0xFFDCDDD6), width: selected ? 2 : 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +148,7 @@ class _SpatialCard extends StatelessWidget {
                 if (selected) const Icon(Icons.check_circle, color: teal, size: 21),
               ]),
               const SizedBox(height: 14),
-              Text(label, style: const TextStyle(color: Color(0xFF183153), fontSize: 14, fontWeight: FontWeight.w700, height: 1.3)),
+              Text(label, style: const TextStyle(color: Color(0xFF202A30), fontSize: 14, fontWeight: FontWeight.w700, height: 1.3)),
             ],
           ),
         ),

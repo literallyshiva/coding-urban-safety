@@ -8,8 +8,8 @@ class LudicPotentialPage extends StatelessWidget {
   const LudicPotentialPage({super.key, required this.assessmentState});
 
   final AssessmentState assessmentState;
-  static const _navy = Color(0xFF183153);
-  static const _teal = Color(0xFF087F8C);
+  static const _navy = Color(0xFF202A30);
+  static const _teal = Color(0xFF647C77);
 
   static const qualities = [
     'Curiosity',
@@ -74,7 +74,7 @@ class LudicPotentialPage extends StatelessWidget {
           children: [
             const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('04 / LUDIC', style: TextStyle(color: _teal, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
-              Text('Your perspective matters', style: TextStyle(color: Color(0xFF8290A0), fontSize: 12)),
+              Text('Your perspective matters', style: TextStyle(color: Color(0xFF82908A), fontSize: 12)),
             ]),
             const SizedBox(height: 14),
             ClipRRect(
@@ -82,14 +82,14 @@ class LudicPotentialPage extends StatelessWidget {
               child: const LinearProgressIndicator(
                 value: 0.8,
                 minHeight: 6,
-                backgroundColor: Color(0xFFE4E7ED),
+                backgroundColor: Color(0xFFE3E5DF),
                 valueColor: AlwaysStoppedAnimation<Color>(_teal),
               ),
             ),
             const SizedBox(height: 32),
             Text('LUDIC POTENTIAL', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: _navy, fontWeight: FontWeight.w900)),
             const SizedBox(height: 12),
-            const Text('What makes this place inviting, playful, or worth exploring?', style: TextStyle(color: Color(0xFF667589), fontSize: 15, height: 1.5)),
+            const Text('What makes this place inviting, playful, or worth exploring?', style: TextStyle(color: Color(0xFF667570), fontSize: 15, height: 1.5)),
             const SizedBox(height: 30),
             const Row(children: [
               Icon(Icons.auto_awesome_outlined, color: _teal, size: 26),
@@ -97,7 +97,7 @@ class LudicPotentialPage extends StatelessWidget {
               Expanded(child: Text('WHICH QUALITIES DESCRIBE THIS PLACE?', style: TextStyle(color: _navy, fontSize: 18, fontWeight: FontWeight.w900, height: 1.3))),
             ]),
             const SizedBox(height: 10),
-            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667589), fontSize: 14)),
+            const Text('Select all that apply, or leave blank.', style: TextStyle(color: Color(0xFF667570), fontSize: 14)),
             const SizedBox(height: 20),
             LayoutBuilder(builder: (context, constraints) {
               final columns = constraints.maxWidth < 340 ? 1 : 2;
@@ -120,7 +120,7 @@ class LudicPotentialPage extends StatelessWidget {
               );
             }),
             const SizedBox(height: 36),
-            const Divider(color: Color(0xFFE2E5EB)),
+            const Divider(color: Color(0xFFDCDDD6)),
             const SizedBox(height: 24),
             const Row(children: [
               Icon(Icons.explore_outlined, color: _teal, size: 26),
@@ -139,12 +139,12 @@ class LudicPotentialPage extends StatelessWidget {
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 2),
                       decoration: BoxDecoration(
-                        color: assessmentState.ludicRating == i ? const Color(0xFFE6F5F2) : Colors.white,
+                        color: assessmentState.ludicRating == i ? const Color(0xFFECEFEA) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: assessmentState.ludicRating == i ? _teal : const Color(0xFFE0E2E8), width: assessmentState.ludicRating == i ? 2 : 1),
+                        border: Border.all(color: assessmentState.ludicRating == i ? _teal : const Color(0xFFDCDDD6), width: assessmentState.ludicRating == i ? 2 : 1),
                       ),
                       child: Column(children: [
-                        Icon(_ratingIcons[i - 1], color: assessmentState.ludicRating == i ? _teal : const Color(0xFF8290A0), size: 28),
+                        Icon(_ratingIcons[i - 1], color: assessmentState.ludicRating == i ? _teal : const Color(0xFF82908A), size: 28),
                         const SizedBox(height: 8),
                         Text('$i', style: const TextStyle(color: _navy, fontWeight: FontWeight.w800, fontSize: 16)),
                       ]),
@@ -154,15 +154,15 @@ class LudicPotentialPage extends StatelessWidget {
             ]),
             const SizedBox(height: 12),
             const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('Not interesting', style: TextStyle(color: Color(0xFF667589), fontSize: 12)),
-              Text('Very interesting', style: TextStyle(color: Color(0xFF667589), fontSize: 12)),
+              Text('Not interesting', style: TextStyle(color: Color(0xFF667570), fontSize: 12)),
+              Text('Very interesting', style: TextStyle(color: Color(0xFF667570), fontSize: 12)),
             ]),
             if (assessmentState.ludicRating != null) ...[
               const SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: const Color(0xFFE6F5F2), borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(color: const Color(0xFFECEFEA), borderRadius: BorderRadius.circular(16)),
                 child: Text(_ratingLabels[assessmentState.ludicRating! - 1], textAlign: TextAlign.center, style: const TextStyle(color: _teal, fontWeight: FontWeight.w800, fontSize: 17)),
               ),
             ],
@@ -183,7 +183,7 @@ class _QualityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const teal = Color(0xFF087F8C);
+    const teal = Color(0xFF647C77);
     return Semantics(
       button: true,
       selected: selected,
@@ -195,9 +195,9 @@ class _QualityCard extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 110),
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE6F5F2) : const Color(0xFFFAFAFC),
+            color: selected ? const Color(0xFFECEFEA) : const Color(0xFFF6F4EF),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? teal : const Color(0xFFE2E5EB), width: selected ? 2 : 1),
+            border: Border.all(color: selected ? teal : const Color(0xFFDCDDD6), width: selected ? 2 : 1),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -205,7 +205,7 @@ class _QualityCard extends StatelessWidget {
               if (selected) const Icon(Icons.check_circle, color: teal, size: 21),
             ]),
             const SizedBox(height: 14),
-            Text(label, style: const TextStyle(color: Color(0xFF183153), fontSize: 14, fontWeight: FontWeight.w700)),
+            Text(label, style: const TextStyle(color: Color(0xFF202A30), fontSize: 14, fontWeight: FontWeight.w700)),
           ]),
         ),
       ),

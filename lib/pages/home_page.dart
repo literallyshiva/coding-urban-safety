@@ -160,61 +160,22 @@ class _Keyword extends StatelessWidget {
 
 class _ArchitecturalIllustration extends StatelessWidget {
   const _ArchitecturalIllustration();
+
   @override
   Widget build(BuildContext context) => Container(
-    height: 250,
     width: double.infinity,
-    decoration: BoxDecoration(color: HomePage.ivory,
-      border: Border.all(color: HomePage.line)),
-    child: const CustomPaint(painter: _CityLineDrawing()),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: HomePage.line),
+    ),
+    child: ClipRect(
+      child: Image.asset(
+        'assets/images/urban_waterfront_sketch.png',
+        width: double.infinity,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        semanticLabel: 'Hand-drawn architectural sketch of a lively waterfront promenade with pedestrians, cyclists, trees, and buildings.',
+      ),
+    ),
   );
-}
-
-class _CityLineDrawing extends CustomPainter {
-  const _CityLineDrawing();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final sx = size.width / 360;
-    final sy = size.height / 250;
-    canvas.save();
-    canvas.scale(sx, sy);
-    final pen = Paint()..color = HomePage.ink..style = PaintingStyle.stroke..strokeWidth = 1.5;
-    final faint = Paint()..color = HomePage.sage.withValues(alpha: .45)..style = PaintingStyle.stroke..strokeWidth = 1;
-    final accent = Paint()..color = HomePage.clay..style = PaintingStyle.stroke..strokeWidth = 2;
-    void segment(double x1, double y1, double x2, double y2, Paint p) =>
-      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), p);
-    void rect(double x, double y, double w, double h, Paint p) =>
-      canvas.drawRect(Rect.fromLTWH(x, y, w, h), p);
-    // Architectural elevations: towers, windows, street level.
-    rect(23, 85, 85, 130, pen);
-    rect(119, 40, 105, 175, pen);
-    rect(235, 101, 99, 114, pen);
-    for (var x = 35.0; x < 100; x += 20) {
-      for (var y = 101.0; y < 195; y += 24) rect(x, y, 10, 14, faint);
-    }
-    for (var x = 134.0; x < 215; x += 25) {
-      for (var y = 57.0; y < 186; y += 28) rect(x, y, 13, 17, faint);
-    }
-    for (var x = 248.0; x < 325; x += 23) {
-      for (var y = 117.0; y < 194; y += 25) rect(x, y, 12, 15, faint);
-    }
-    segment(0, 215, 360, 215, pen);
-    segment(0, 231, 360, 231, faint);
-    segment(165, 16, 165, 39, accent);
-    segment(155, 27, 175, 27, accent);
-    // A tree and human-scale markers in the foreground.
-    segment(282, 187, 282, 215, pen);
-    canvas.drawCircle(const Offset(282, 174), 15, pen);
-    canvas.drawCircle(const Offset(272, 180), 12, faint);
-    canvas.drawCircle(const Offset(292, 182), 12, faint);
-    canvas.drawCircle(const Offset(83, 198), 5, accent);
-    segment(83, 203, 83, 218, accent);
-    segment(83, 209, 76, 214, accent);
-    segment(83, 209, 90, 214, accent);
-    segment(83, 218, 78, 227, accent);
-    segment(83, 218, 89, 227, accent);
-    canvas.restore();
-  }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

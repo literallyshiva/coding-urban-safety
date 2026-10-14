@@ -105,12 +105,15 @@ service cloud.firestore {
         && validGender(data);
     }
 
-    // Only this verified Google account can read assessments.
-    function isResearcher() {
-      return request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email == 'shivanandt120@gmail.com','malavika8224@gmail.com';
-    }
+    // Only these verified Google accounts can read assessments.
+function isResearcher() {
+  return request.auth != null
+    && request.auth.token.email_verified == true
+    && request.auth.token.email in [
+      'shivanandt120@gmail.com',
+      'malavika8224@gmail.com'
+    ];
+}
 
     match /places/{placeId} {
 

@@ -109,7 +109,7 @@ service cloud.firestore {
     function isResearcher() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email == 'shivanandt120@gmail.com';
+        && request.auth.token.email == 'shivanandt120@gmail.com','malavika8224@gmail.com';
     }
 
     match /places/{placeId} {

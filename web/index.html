@@ -29,6 +29,18 @@
         text: x.placePrediction.text.toString()
       }));
     };
+    // Human-readable labels for existing coordinate-only places.
+    // Uses Maps JavaScript Geocoder; enable the Geocoding API for this key.
+    window.urbanSafetyReverseGeocode = async function (lat, lng) {
+      const geocoder = new google.maps.Geocoder();
+      const response = await geocoder.geocode({location: {lat, lng}});
+      const results = response.results || [];
+      if (!results.length) return '';
+      const preferred = results.find(r =>
+        r.types.includes('point_of_interest') || r.types.includes('premise') ||
+        r.types.includes('route') || r.types.includes('neighborhood')) || results[0];
+      return preferred.formatted_address || '';
+    };
     window.urbanSafetyResolvePlace = async function (id) {
       const {Place} = await google.maps.importLibrary('places');
       const place = new Place({id});

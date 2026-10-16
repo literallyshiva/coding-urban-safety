@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../state/assessment_state.dart';
 import '../services/place_search.dart';
+import '../services/place_labels.dart';
 import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
 import 'safety_assessment_page.dart';
@@ -293,7 +294,11 @@ class _MapPageState extends State<MapPage> {
                     final point = doc.data()['location'];
                     if (point is! GeoPoint) return const SizedBox.shrink();
                     final pos = LatLng(point.latitude, point.longitude);
-                    return ListTile(dense: true, selected: _placeId == doc.id, title: Text('Place ${index+1}'), subtitle: Text('${point.latitude.toStringAsFixed(5)}, ${point.longitude.toStringAsFixed(5)}'), onTap: () {
+                    return ListTile(dense: true, selected: _placeId == doc.id, title: FutureBuilder<String>(
+                      future: PlaceLabels.forPoint(point),
+                      builder: (context, name) => Text(name.data ?? 'Finding location…',
+                        maxLines: 2, overflow: TextOverflow.ellipsis)),
+                    subtitle: Text(PlaceLabels.coordinates(point)), onTap: () {
                       setState(() { _selected = pos; _placeId = doc.id; });
                       _mapController?.animateCamera(CameraUpdate.newLatLngZoom(pos, 17));
                     });

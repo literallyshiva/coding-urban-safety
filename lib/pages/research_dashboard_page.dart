@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../services/place_labels.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../widgets/research_scaffold.dart';
 import '../services/app_preferences.dart';
@@ -205,8 +206,15 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
       color: selected ? Theme.of(context).colorScheme.secondaryContainer : null,
       child: Padding(padding: const EdgeInsets.all(16), child: Column(
         crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('PLACE ${id.length > 12 ? id.substring(0,12) : id}',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          if (records.first['location'] is GeoPoint)
+            FutureBuilder<String>(
+              future: PlaceLabels.forPoint(records.first['location'] as GeoPoint),
+              builder: (context, name) => Text(
+                name.data ?? 'Finding location…',
+                style: const TextStyle(fontWeight: FontWeight.bold))),
+          if (records.first['location'] is GeoPoint)
+            Text(PlaceLabels.coordinates(records.first['location'] as GeoPoint)),
+          Text('Research ID: $id', style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 8),
           Wrap(spacing: 12, runSpacing: 10, children: [
             _metric('Assessments', '${records.length}'),

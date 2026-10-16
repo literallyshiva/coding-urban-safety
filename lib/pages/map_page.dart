@@ -41,8 +41,9 @@ class _MapPageState extends State<MapPage> {
   bool _routeMode = false;
   void _onSearchChanged(String query) {
     _searchDebounce?.cancel();
+    ++_searchGeneration;
     if (query.trim().length < 3) {
-      setState(() { _suggestions = []; _searchError = null; });
+      setState(() { _suggestions = []; _searchError = null; _searching = false; });
       return;
     }
     _searchDebounce = Timer(const Duration(milliseconds: 450), _searchPlaces);
@@ -73,14 +74,13 @@ class _MapPageState extends State<MapPage> {
       if (mounted && generation == _searchGeneration) setState(() { _suggestions = results;
         if (results.isEmpty) _searchError = 'No matching places found.'; });
     } catch (e, stackTrace) {
-  debugPrint('Places search failed: $e');
-  debugPrintStack(stackTrace: stackTrace);
-
-  if (mounted) {
-    setState(() => _searchError = 'Place search failed: $e');
-  }
-} finally {
-      if (mounted) setState(() => _searching = false);
+      debugPrint('Places search failed: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted && generation == _searchGeneration) {
+        setState(() => _searchError = 'Place search is temporarily unavailable. Please try again.');
+      }
+    } finally {
+      if (mounted && generation == _searchGeneration) setState(() => _searching = false);
     }
   }
 
@@ -95,7 +95,10 @@ class _MapPageState extends State<MapPage> {
       setState(() { _manualMode = true; _existingMode = false;
         _selected = location; _placeId = null; _suggestions = [];
         _searchController.text = suggestion.description; });
-      if (_routeMode) _addRouteStop(location);
+      if (_routeMode) {
+        _addRouteStop(location);
+        if (mounted) setState(() { _selected = null; _placeId = null; });
+      }
       await _mapController?.animateCamera(CameraUpdate.newLatLngZoom(location, 17));
     } catch (_) {
       if (mounted) setState(() => _searchError = 'Unable to select this place. Try another result.');
@@ -229,7 +232,7 @@ class _MapPageState extends State<MapPage> {
             child: SafeArea(child: Material(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12), child: Column(children: [
               Wrap(spacing: 5, children: [
                 ChoiceChip(label: const Text('Route planner'), selected: _routeMode,
-                  onSelected: (v) => setState(() { _routeMode = v; if (v) _manualMode = true; })),
+                  onSelected: (v) => setState(() { _routeMode = v; if (v) { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; } })),
                 if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () => setState(() => _routeStops.clear()),
                   icon: const Icon(Icons.clear), label: const Text('Clear stops')),
                 ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
@@ -352,7 +355,7 @@ class _MapPageState extends State<MapPage> {
               child: PrimaryActionButton(
                 label: AppPreferences.instance.tr('ASSESS A PLACE', 'ഇടം വിലയിരുത്തുക'),
                 loading: !_manualMode && !_existingMode && _loadingLocation,
-                onPressed: (_manualMode || _existingMode) && location == null ? null : _assessPlace,
+                onPressed: _routeMode || ((_manualMode || _existingMode) && location == null) ? null : _assessPlace,
               ),
             ),
           ),

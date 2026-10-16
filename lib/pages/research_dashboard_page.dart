@@ -202,7 +202,7 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
     final conditions = _frequency(records.map((r) => r['unsafe_conditions']));
     final responses = _frequency(records.map((r) => r['design_responses']));
     return Card(
-      color: selected ? const Color(0xFFECEFEA) : null,
+      color: selected ? Theme.of(context).colorScheme.secondaryContainer : null,
       child: Padding(padding: const EdgeInsets.all(16), child: Column(
         crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('PLACE ${id.length > 12 ? id.substring(0,12) : id}',
@@ -326,7 +326,7 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
       'ludic_rating', 'design_responses', 'other_suggestion', 'created_at',
     ];
     final lines = <String>[fields.join(',')];
-    for (final record in _records) {
+    for (final record in _filtered) {
       final data = record.data();
       lines.add(fields.map((field) => _csvCell(data[field])).join(','));
     }
@@ -334,7 +334,7 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
         'text/csv;charset=utf-8');
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..download = 'urban-safety-research.csv';
+      ..download = 'urban-safety-research-filtered.csv';
     anchor.click();
     html.Url.revokeObjectUrl(url);
   }
@@ -369,8 +369,8 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
             Wrap(spacing: 10, runSpacing: 10, children: [
               FilledButton.icon(onPressed: _loading ? null : _load,
                   icon: const Icon(Icons.refresh), label: const Text('LOAD / REFRESH')),
-              OutlinedButton.icon(onPressed: _records.isEmpty ? null : _exportCsv,
-                  icon: const Icon(Icons.download), label: const Text('EXPORT CSV')),
+              OutlinedButton.icon(onPressed: _filtered.isEmpty ? null : _exportCsv,
+                  icon: const Icon(Icons.download), label: const Text('EXPORT FILTERED CSV')),
               TextButton(onPressed: () async {
                 await FirebaseAuth.instance.signOut();
                 if (mounted) setState(() { _records = []; _error = null; });
@@ -381,7 +381,7 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
                 child: Text(_error!, style: const TextStyle(color: Colors.red))),
             const SizedBox(height: 16),
             const Text('Results cover only the latest 500 assessments. '
-                'CSV export has the same limit; this is not an all-time total.',
+                'Charts, comparisons, and filtered CSV export use this loaded sample; these are not all-time totals.',
                 style: TextStyle(fontSize: 12)),
             const SizedBox(height: 16),
             Wrap(spacing: 12, runSpacing: 12, children: [

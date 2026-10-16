@@ -28,17 +28,19 @@ async function main() {
     'utf8',
   );
 
-  const researcherEmail = rulesText.match(
-    /request\.auth\.token\.email == '([^']+)'/,
-  )?.[1];
+  // The rules use a verified-email allowlist rather than a single email equality.
+  const researcherEmails = [
+    'shivanandt120@gmail.com',
+    'malavika8224@gmail.com',
+  ];
 
-  if (!researcherEmail) {
-    throw new Error(
-      'Researcher email not configured in rules.',
-    );
+  for (const email of researcherEmails) {
+    if (!rulesText.includes(`'${email}'`)) {
+      throw new Error(`Researcher email not configured in rules: ${email}`);
+    }
   }
 
-  const env = await initializeTestEnvironment({
+    const env = await initializeTestEnvironment({
     projectId: 'demo-urban-safety-tests',
     firestore: {
       host: '127.0.0.1',
@@ -219,29 +221,18 @@ async function main() {
     // TEST 9: AUTHORIZED RESEARCHER
     // ==========================================
 
-    const researcher = env.authenticatedContext(
-      'researcher-user',
-      {
-        email: researcherEmail,
-        email_verified: true,
-      },
-    ).firestore();
+    for (const [index, email] of researcherEmails.entries()) {
+      const researcher = env.authenticatedContext(
+        `researcher-user-${index}`,
+        { email, email_verified: true },
+      ).firestore();
 
-    await assertSucceeds(getDoc(
-      doc(
-        researcher,
-        'assessments',
-        'test-assessment-001',
-      ),
-    ));
-
-    await assertSucceeds(
-      getDocs(collection(researcher, 'assessments')),
-    );
-
-    console.log(
-      'PASS: Verified researcher can read assessments',
-    );
+      await assertSucceeds(getDoc(doc(
+        researcher, 'assessments', 'test-assessment-001',
+      )));
+      await assertSucceeds(getDocs(collection(researcher, 'assessments')));
+      console.log(`PASS: Verified researcher ${email} can read assessments`);
+    }
 
     // ==========================================
     // TEST 10: UNVERIFIED RESEARCHER
@@ -250,7 +241,7 @@ async function main() {
     const unverified = env.authenticatedContext(
       'unverified-user',
       {
-        email: researcherEmail,
+        email: researcherEmails[0],
         email_verified: false,
       },
     ).firestore();

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../widgets/research_scaffold.dart';
+import '../services/app_preferences.dart';
 
 /// Access is enforced by Firestore rules, NOT by hiding this route.
 class ResearchDashboardPage extends StatefulWidget {
@@ -19,12 +20,18 @@ class _ResearchDashboardPageState extends State<ResearchDashboardPage> {
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _records = [];
   static const _limit = 500;
   String _gender = 'All';
+  int _daysBack = 0;
+  final Set<String> _comparePlaces = {}; 
   String _condition = 'All';
   int _minimumSafety = 0;
   String? _selectedPlaceId;
 
   List<QueryDocumentSnapshot<Map<String, dynamic>>> get _filtered => _records.where((r) {
     final d = r.data();
+    if (_daysBack > 0) {
+      final created = d['created_at'];
+      if (created is! Timestamp || created.toDate().isBefore(DateTime.now().subtract(Duration(days: _daysBack)))) return false;
+    }
     if (_gender != 'All' && d['gender'] != _gender) return false;
     if (_condition != 'All' && !(d['unsafe_conditions'] is List &&
         (d['unsafe_conditions'] as List).contains(_condition))) return false;
@@ -139,6 +146,12 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
       Text('EXPLORE ASSESSMENTS', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 12),
       Wrap(spacing: 12, runSpacing: 10, children: [
+        DropdownButton<int>(value: _daysBack,
+          items: const [DropdownMenuItem(value: 0, child: Text('All loaded dates')),
+            DropdownMenuItem(value: 7, child: Text('Last 7 days')),
+            DropdownMenuItem(value: 30, child: Text('Last 30 days')),
+            DropdownMenuItem(value: 90, child: Text('Last 90 days'))],
+          onChanged: (v) => setState(() => _daysBack = v ?? 0)),
         DropdownButton<String>(value: _gender, items: ['All','Male','Female','Other']
             .map((v) => DropdownMenuItem(value: v, child: Text(v == 'All' ? 'All genders' : v))).toList(),
             onChanged: (v) => setState(() { _gender = v ?? 'All'; _selectedPlaceId = null; })),
@@ -171,6 +184,10 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
           'Markers show only places within the loaded assessment sample.',
           style: TextStyle(fontSize: 12)),
       const SizedBox(height: 24),
+      _ratingChart(),
+      const SizedBox(height: 20),
+      _comparison(places),
+      const SizedBox(height: 20),
       Text('PLACE SUMMARIES', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 12),
       if (rows.isEmpty) const Text('No matching places. Adjust your filters.'),
@@ -200,6 +217,14 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
           Text('Top unsafe condition: ${_top(conditions)}'),
           Text('Top requested intervention: ${_top(responses)}'),
           const SizedBox(height: 10),
+          CheckboxListTile(
+            dense: true, contentPadding: EdgeInsets.zero,
+            title: const Text('Compare this place (select up to 3)'),
+            value: _comparePlaces.contains(id),
+            onChanged: (v) => setState(() {
+              if (v == true && _comparePlaces.length < 3) _comparePlaces.add(id);
+              if (v == false) _comparePlaces.remove(id);
+            })),
           OutlinedButton.icon(
             onPressed: () => _exportPlaceReport(id, records),
             icon: const Icon(Icons.description_outlined),
@@ -208,6 +233,47 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
     );
   }
 
+
+  Widget _ratingChart() {
+    final counts = List<int>.filled(5, 0);
+    for (final record in _filtered) {
+      final rating = record.data()['safety_rating'];
+      if (rating is num && rating >= 1 && rating <= 5) counts[rating.toInt()-1]++;
+    }
+    final maximum = counts.fold<int>(1, (m, n) => n > m ? n : m);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('SAFETY RATING DISTRIBUTION', style: Theme.of(context).textTheme.titleLarge),
+      const SizedBox(height: 12),
+      for (var i = 0; i < 5; i++) Padding(padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(children: [SizedBox(width: 42, child: Text('${i+1}/5')),
+          Expanded(child: LinearProgressIndicator(value: counts[i]/maximum, minHeight: 17,
+            borderRadius: BorderRadius.circular(4))),
+          SizedBox(width: 45, child: Text('  ${counts[i]}'))])),
+      const Text('Counts are based on filtered, loaded assessments only.',
+        style: TextStyle(fontSize: 12)),
+    ]);
+  }
+
+  Widget _comparison(Map<String, List<Map<String, dynamic>>> places) {
+    final selected = _comparePlaces.where(places.containsKey).toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('COMPARE PLACES', style: Theme.of(context).textTheme.titleLarge),
+      const SizedBox(height: 8),
+      const Text('Select up to three place cards below to compare their results.'),
+      if (selected.isNotEmpty) SingleChildScrollView(scrollDirection: Axis.horizontal,
+        child: DataTable(columns: const [DataColumn(label: Text('Place')),
+          DataColumn(label: Text('Assessments')),
+          DataColumn(label: Text('Mean safety')),
+          DataColumn(label: Text('Mean ludic'))], rows: [
+          for (final id in selected) DataRow(cells: [
+            DataCell(Text(id.length > 12 ? id.substring(0,12) : id)),
+            DataCell(Text('${places[id]!.length}')),
+            DataCell(Text(_mean(places[id]!.map((r) => r['safety_rating']))?.toStringAsFixed(2) ?? '—')),
+            DataCell(Text(_mean(places[id]!.map((r) => r['ludic_rating']))?.toStringAsFixed(2) ?? '—')),
+          ])
+        ])),
+    ]);
+  }
 
   Future<void> _signIn() async {
     setState(() { _loading = true; _error = null; });

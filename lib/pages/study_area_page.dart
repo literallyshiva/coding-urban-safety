@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
+import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
 import 'map_page.dart';
 
@@ -17,7 +18,7 @@ class StudyAreaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResearchScaffold(
       bottomButton: PrimaryActionButton(
-        label: 'START WALK',
+        label: AppPreferences.instance.tr('START WALK', 'നടത്തം ആരംഭിക്കുക'),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -40,15 +41,13 @@ class StudyAreaPage extends StatelessWidget {
           ]),
           const SizedBox(height: 22),
           Text(
-            'EXPLORE THE STUDY AREA',
+            AppPreferences.instance.tr('EXPLORE THE STUDY AREA', 'പഠന പ്രദേശം പര്യവേക്ഷണം ചെയ്യുക'),
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 14),
 
           Text(
-            'Every street, park, and public space has a story. '
-            'Take a moment to observe your surroundings and '
-            'share how the space makes you feel.',
+            AppPreferences.instance.tr('Every street, park, and public space has a story. Take a moment to observe your surroundings and share how the space makes you feel.', 'ഓരോ തെരുവിനും പാർക്കിനും പൊതു ഇടത്തിനും ഒരു കഥയുണ്ട്. ചുറ്റുപാടുകൾ നിരീക്ഷിച്ച് നിങ്ങളുടെ അനുഭവം പങ്കുവെക്കൂ.'),
             style: Theme.of(context).textTheme.bodyLarge,
           ),
 

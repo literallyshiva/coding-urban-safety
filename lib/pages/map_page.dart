@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
@@ -5,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../state/assessment_state.dart';
 import '../services/place_search.dart';
+import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
 import 'safety_assessment_page.dart';
 
@@ -33,10 +35,26 @@ class _MapPageState extends State<MapPage> {
   final TextEditingController _searchController = TextEditingController();
   List<PlaceSuggestion> _suggestions = [];
   bool _searching = false;
+  Timer? _searchDebounce;
+  int _searchGeneration = 0;
+  final List<LatLng> _routeStops = [];
+  bool _routeMode = false;
+  void _onSearchChanged(String query) {
+    _searchDebounce?.cancel();
+    if (query.trim().length < 3) {
+      setState(() { _suggestions = []; _searchError = null; });
+      return;
+    }
+    _searchDebounce = Timer(const Duration(milliseconds: 450), _searchPlaces);
+  }
+  void _addRouteStop(LatLng point) => setState(() {
+    if (_routeStops.length < 20) _routeStops.add(point);
+  });
   String? _searchError;
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _mapController?.dispose();
     super.dispose();
@@ -48,10 +66,11 @@ class _MapPageState extends State<MapPage> {
       setState(() => _searchError = 'Enter at least 3 characters.');
       return;
     }
+    final generation = ++_searchGeneration;
     setState(() { _searching = true; _searchError = null; _suggestions = []; });
     try {
       final results = await PlaceSearch.search(query);
-      if (mounted) setState(() { _suggestions = results;
+      if (mounted && generation == _searchGeneration) setState(() { _suggestions = results;
         if (results.isEmpty) _searchError = 'No matching places found.'; });
     } catch (e, stackTrace) {
   debugPrint('Places search failed: $e');
@@ -66,6 +85,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _selectSuggestion(PlaceSuggestion suggestion) async {
+    _searchDebounce?.cancel();
+    ++_searchGeneration;
     setState(() { _searching = true; _searchError = null; });
     try {
       final point = await PlaceSearch.resolve(suggestion.id);
@@ -74,6 +95,7 @@ class _MapPageState extends State<MapPage> {
       setState(() { _manualMode = true; _existingMode = false;
         _selected = location; _placeId = null; _suggestions = [];
         _searchController.text = suggestion.description; });
+      if (_routeMode) _addRouteStop(location);
       await _mapController?.animateCamera(CameraUpdate.newLatLngZoom(location, 17));
     } catch (_) {
       if (mounted) setState(() => _searchError = 'Unable to select this place. Try another result.');
@@ -166,7 +188,7 @@ class _MapPageState extends State<MapPage> {
     final location = _selected;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('CODING URBAN SAFETY')),
+      appBar: AppBar(title: const Text('CODING URBAN SAFETY'), actions: const [AppSettingsButton()]),
       body: Stack(
         children: [
           GoogleMap(
@@ -181,13 +203,20 @@ class _MapPageState extends State<MapPage> {
             },
             myLocationEnabled: !_manualMode && !_existingMode && location != null,
             onTap: (point) {
-              if (_manualMode) setState(() { _selected = point; _placeId = null; });
+              if (_routeMode) { _addRouteStop(point); }
+              else if (_manualMode) { setState(() { _selected = point; _placeId = null; }); }
             },
             myLocationButtonEnabled: true,
             zoomControlsEnabled: false,
-            markers: location == null
-                ? const {}
-                : {
+            polylines: _routeStops.length < 2 ? {} : {
+              Polyline(polylineId: const PolylineId('research-route'),
+                points: _routeStops, color: const Color(0xFF647C77), width: 4),
+            },
+            markers: {
+              for (var i = 0; i < _routeStops.length; i++)
+                Marker(markerId: MarkerId('stop-$i'), position: _routeStops[i],
+                  infoWindow: InfoWindow(title: 'Research stop ${i + 1}')),
+              if (location != null)
                     Marker(
                       markerId: const MarkerId('assessment-location'),
                       position: location,
@@ -197,8 +226,12 @@ class _MapPageState extends State<MapPage> {
           ),
           Positioned(
             left: 16, right: 16, top: 12,
-            child: SafeArea(child: Material(color: Colors.white, borderRadius: BorderRadius.circular(12), child: Column(children: [
+            child: SafeArea(child: Material(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12), child: Column(children: [
               Wrap(spacing: 5, children: [
+                ChoiceChip(label: const Text('Route planner'), selected: _routeMode,
+                  onSelected: (v) => setState(() { _routeMode = v; if (v) _manualMode = true; })),
+                if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () => setState(() => _routeStops.clear()),
+                  icon: const Icon(Icons.clear), label: const Text('Clear stops')),
                 ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
                 ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
                 ChoiceChip(label: const Text('Existing places'), selected: _existingMode, onSelected: (_) => setState(() { _manualMode = false; _existingMode = true; _selected = null; _placeId = null; })),
@@ -209,10 +242,11 @@ class _MapPageState extends State<MapPage> {
                   Expanded(child: TextField(
                     controller: _searchController,
                     textInputAction: TextInputAction.search,
+                    onChanged: _onSearchChanged,
                     onSubmitted: (_) => _searchPlaces(),
                     decoration: const InputDecoration(
                       isDense: true, prefixIcon: Icon(Icons.search),
-                      hintText: 'Search a landmark or address',
+                      hintText: 'Search landmarks, streets or addresses',
                     ),
                   )),
                   const SizedBox(width: 6),
@@ -226,6 +260,10 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ]),
               ),
+              if (_routeMode) Padding(padding: const EdgeInsets.all(8), child: Text(
+                'Tap map or choose search results to add stops (${_routeStops.length}/20). '
+                'Lines connect waypoints directly; they are NOT road-following walking directions.',
+                style: const TextStyle(fontSize: 12))),
               if (_searchError != null)
                 Padding(padding: const EdgeInsets.all(8),
                   child: Text(_searchError!, style: const TextStyle(color: Colors.red))),
@@ -268,7 +306,7 @@ class _MapPageState extends State<MapPage> {
             child: SafeArea(
               bottom: false,
               child: Material(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 elevation: 2,
                 borderRadius: BorderRadius.circular(16),
                 child: Padding(
@@ -284,7 +322,7 @@ class _MapPageState extends State<MapPage> {
                         child: Text(
                           (!_manualMode && !_existingMode && _loadingLocation)
                               ? 'Finding your current location…'
-                              : (_manualMode ? 'Tap the map or search above to choose a new place.' : _existingMode ? 'Select a contributed place from the list.' : (_locationError ?? 'Choose this place when ready.')),
+                              : (_manualMode ? AppPreferences.instance.tr('Tap the map or search above to choose a new place.', 'പുതിയ ഇടം തിരഞ്ഞെടുക്കാൻ മാപ്പിൽ തൊടുക അല്ലെങ്കിൽ തിരയുക.') : _existingMode ? 'Select a contributed place from the list.' : (_locationError ?? 'Choose this place when ready.')),
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -312,7 +350,7 @@ class _MapPageState extends State<MapPage> {
             child: SafeArea(
               top: false,
               child: PrimaryActionButton(
-                label: 'ASSESS A PLACE',
+                label: AppPreferences.instance.tr('ASSESS A PLACE', 'ഇടം വിലയിരുത്തുക'),
                 loading: !_manualMode && !_existingMode && _loadingLocation,
                 onPressed: (_manualMode || _existingMode) && location == null ? null : _assessPlace,
               ),

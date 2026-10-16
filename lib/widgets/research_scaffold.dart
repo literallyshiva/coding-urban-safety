@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/app_preferences.dart';
 
 class ResearchScaffold extends StatelessWidget {
   const ResearchScaffold({
@@ -17,7 +18,7 @@ class ResearchScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(appBarTitle)),
+      appBar: AppBar(title: Text(appBarTitle), actions: const [AppSettingsButton()]),
       body: SafeArea(
         child: Column(
           children: [
@@ -44,8 +45,8 @@ class ResearchScaffold extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   border: Border(
                     top: BorderSide(color: Color(0xFFDCDDD6)),
                   ),
@@ -151,4 +152,30 @@ class ChipWrap extends StatelessWidget {
           .toList(),
     );
   }
+}
+
+class AppSettingsButton extends StatelessWidget {
+  const AppSettingsButton({super.key});
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: AppPreferences.instance,
+    builder: (context, _) => PopupMenuButton<String>(
+      tooltip: 'Theme and language / തീമും ഭാഷയും',
+      icon: const Icon(Icons.settings_outlined),
+      onSelected: (value) {
+        if (value == 'light') AppPreferences.instance.setTheme(ThemeMode.light);
+        if (value == 'dark') AppPreferences.instance.setTheme(ThemeMode.dark);
+        if (value == 'system') AppPreferences.instance.setTheme(ThemeMode.system);
+        if (value == 'en' || value == 'ml') AppPreferences.instance.setLanguage(value);
+      },
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: 'system', child: Text('Theme: System')),
+        PopupMenuItem(value: 'light', child: Text('☀ Light / പകൽ')),
+        PopupMenuItem(value: 'dark', child: Text('☾ Dark / രാത്രി')),
+        PopupMenuDivider(),
+        PopupMenuItem(value: 'en', child: Text('English')),
+        PopupMenuItem(value: 'ml', child: Text('മലയാളം')),
+      ],
+    ),
+  );
 }

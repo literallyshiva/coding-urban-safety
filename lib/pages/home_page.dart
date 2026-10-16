@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
+import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
 import 'study_area_page.dart';
 import 'safety_assessment_page.dart';
@@ -62,13 +63,13 @@ class HomePage extends StatelessWidget {
               style: TextStyle(fontSize: 11, letterSpacing: 2,
                 fontWeight: FontWeight.w700, color: sage)),
             const SizedBox(height: 13),
-            const Text('How do we\nexperience\nour cities?',
+            Text(AppPreferences.instance.tr('How do we\nexperience\nour cities?', 'നമ്മുടെ നഗരങ്ങളെ\nനാം എങ്ങനെ\nഅനുഭവിക്കുന്നു?'),
               style: TextStyle(fontSize: 47, height: 1.06,
                 fontWeight: FontWeight.w500, letterSpacing: -2.0, color: ink)),
             const SizedBox(height: 20),
             Container(height: 2, width: 65, color: clay),
             const SizedBox(height: 21),
-            const Text('A study of safety, movement and playful exploration in public spaces.',
+            Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
               style: TextStyle(fontSize: 17, height: 1.55, color: ink)),
             const SizedBox(height: 27),
             const _ArchitecturalIllustration(),
@@ -79,7 +80,7 @@ class HomePage extends StatelessWidget {
               _Keyword('03  EXPLORATION'),
             ]),
             const SizedBox(height: 23),
-            const Text('Every place has a story. Your observations can help us understand how public spaces feel and function.',
+            Text(AppPreferences.instance.tr('Every place has a story. Your observations can help us understand how public spaces feel and function.', 'ഓരോ ഇടത്തിനും ഒരു കഥയുണ്ട്. നിങ്ങളുടെ നിരീക്ഷണങ്ങൾ പൊതു ഇടങ്ങളെ മനസ്സിലാക്കാൻ സഹായിക്കും.'),
               style: TextStyle(fontSize: 14, height: 1.65, color: ink)),
             const SizedBox(height: 26),
             SizedBox(
@@ -91,7 +92,7 @@ class HomePage extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
                 onPressed: () => _start(context),
                 child: const Row(mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Text('BEGIN THE STUDY',
+                  children: [Text(AppPreferences.instance.tr('BEGIN THE STUDY', 'പഠനം ആരംഭിക്കുക'),
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
                     SizedBox(width: 13), Icon(Icons.arrow_forward, size: 19)]),
               ),

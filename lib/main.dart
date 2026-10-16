@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/home_page.dart';
+import 'services/app_preferences.dart';
 import 'services/draft_storage.dart';
 import 'state/assessment_state.dart';
 
@@ -20,6 +21,7 @@ Future<void> main() async {
 );
   final assessmentState = AssessmentState();
   await DraftStorage(assessmentState).initialize();
+  await AppPreferences.load();
   runApp(CodingUrbanSafetyApp(assessmentState: assessmentState));
 }
 
@@ -40,8 +42,12 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
     const primary = Color(0xFF647C77);
     const background = Color(0xFFF6F4EF);
 
-    return MaterialApp(
+    return AnimatedBuilder(
+      animation: AppPreferences.instance,
+      builder: (context, _) => MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: AppPreferences.instance.themeMode,
+      locale: Locale(AppPreferences.instance.language),
       title: 'CODING URBAN SAFETY',
       theme: ThemeData(
         useMaterial3: true,
@@ -111,7 +117,13 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           contentPadding: const EdgeInsets.all(16),
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: primary, brightness: Brightness.dark),
+        scaffoldBackgroundColor: const Color(0xFF151C1C),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1D2928)),
+      ),
       home: HomePage(assessmentState: widget.assessmentState),
-    );
+    ));
   }
 }

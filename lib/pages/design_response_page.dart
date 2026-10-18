@@ -1,3 +1,4 @@
+import '../widgets/research_progress.dart';
 import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
@@ -85,6 +86,8 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
         builder: (context, _) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+              const ResearchProgress(stage: 4),
+              const SizedBox(height: 18),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('05 / DESIGN', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
               Text('Final step', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12)),
@@ -112,6 +115,8 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
             const SizedBox(height: 10),
             Text('Select all that apply, or leave blank.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14)),
             const SizedBox(height: 20),
+            Text('\u2713 ${state.designResponses.length} of ${responses.length} selected', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
             LayoutBuilder(builder: (context, constraints) {
               final columns = constraints.maxWidth < 340 ? 1 : 2;
               final width = (constraints.maxWidth - (columns - 1) * 12) / columns;

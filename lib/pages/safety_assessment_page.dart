@@ -1,3 +1,4 @@
+import '../widgets/research_progress.dart';
 
 import 'package:flutter/material.dart';
 
@@ -98,6 +99,8 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const ResearchProgress(stage: 0),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment:
                     MainAxisAlignment.spaceBetween,
@@ -263,7 +266,9 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
 
               const SizedBox(height: 20),
 
-              LayoutBuilder(builder: (context, constraints) {
+              Text('\u2713 ${state.unsafeConditions.length} of ${unsafeOptions.length} selected', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
+            LayoutBuilder(builder: (context, constraints) {
                 final columns = constraints.maxWidth < 340 ? 1 : 2;
                 final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
                 return Wrap(

@@ -1,3 +1,4 @@
+import '../widgets/research_progress.dart';
 import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
@@ -58,6 +59,8 @@ class SpatialAssessmentPage extends StatelessWidget {
         builder: (context, _) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+              const ResearchProgress(stage: 2),
+              const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -88,6 +91,8 @@ class SpatialAssessmentPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text('Select all that apply, or leave blank.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14)),
             const SizedBox(height: 20),
+            Text('\u2713 ${assessmentState.spatialConditions.length} of ${spatialOptions.length} selected', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
             LayoutBuilder(builder: (context, constraints) {
               final columns = constraints.maxWidth < 340 ? 1 : 2;
               final width = (constraints.maxWidth - (columns - 1) * 12) / columns;

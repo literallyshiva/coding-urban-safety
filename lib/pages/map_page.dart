@@ -41,6 +41,8 @@ class _MapPageState extends State<MapPage> {
   final List<LatLng> _routeStops = [];
   bool _routeMode = false;
   int? _activeRouteStop;
+  final Set<int> _assessedStopIndices = {};
+  bool _showStopTimeline = true;
   static const int _minRouteStops = 3;
   static const int _maxRouteStops = 20;
   // Ignore clicks that reach the map after interacting with overlay controls.
@@ -196,6 +198,11 @@ class _MapPageState extends State<MapPage> {
     }
     if (!mounted || widget.assessmentState.location == null) return;
 
+    if (_routeMode && _activeRouteStop != null) {
+      // A visited assessment form is not proof of submission.
+      // Only mark the stop as opened, never as completed.
+      _assessedStopIndices.add(_activeRouteStop!);
+    }
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => SafetyAssessmentPage(
@@ -256,13 +263,17 @@ class _MapPageState extends State<MapPage> {
             child: Listener(
               behavior: HitTestBehavior.opaque,
               onPointerDown: (_) => _suppressMapTaps(),
-              child: SafeArea(child: Material(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12), child: Column(children: [
+              child: SafeArea(child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.58),
+                child: Material(color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  child: SingleChildScrollView(child: Column(children: [
               Wrap(spacing: 5, children: [
                 ChoiceChip(label: const Text('Route planner'), selected: _routeMode,
                   onSelected: (v) => setState(() { _routeMode = v; if (v) { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; } })),
                 if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () {
                   _suppressMapTaps();
-                  setState(() { _routeStops.clear(); _activeRouteStop = null; });
+                  setState(() { _routeStops.clear(); _activeRouteStop = null; _assessedStopIndices.clear(); });
                 },
                   icon: const Icon(Icons.clear), label: const Text('Clear stops')),
                 ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _routeMode = false; _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
@@ -309,6 +320,51 @@ class _MapPageState extends State<MapPage> {
                     const SizedBox(width: 8),
                     Text('${_routeStops.length}/$_minRouteStops ready'),
                   ]),
+                  Row(children: [
+                    Icon(Icons.timeline_rounded, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 6),
+                    const Expanded(child: Text('STOP TIMELINE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
+                    TextButton.icon(
+                      onPressed: () => setState(() => _showStopTimeline = !_showStopTimeline),
+                      icon: Icon(_showStopTimeline ? Icons.expand_less : Icons.expand_more),
+                      label: Text(_showStopTimeline ? 'Hide' : 'Show'),
+                    ),
+                  ]),
+                  if (_showStopTimeline && _routeStops.isNotEmpty)
+                    ConstrainedBox(constraints: const BoxConstraints(maxHeight: 156),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _routeStops.length,
+                        itemBuilder: (context, i) {
+                          final pos = _routeStops[i];
+                          final selected = _activeRouteStop == i;
+                          return Card(
+                            color: selected ? Theme.of(context).colorScheme.primaryContainer : null,
+                            child: ListTile(
+                              dense: true,
+                              leading: CircleAvatar(radius: 17, child: Text('${i + 1}')),
+                              title: Text('Stop ${i + 1}  •  ${_assessedStopIndices.contains(i) ? 'Assessment opened' : 'Not assessed'}'),
+                              subtitle: Text('${pos.latitude.toStringAsFixed(5)}, ${pos.longitude.toStringAsFixed(5)}'),
+                              trailing: IconButton(
+                                tooltip: 'Remove stop ${i + 1}',
+                                icon: const Icon(Icons.close),
+                                onPressed: () { _suppressMapTaps(); setState(() {
+                                  _routeStops.removeAt(i);
+                                  _assessedStopIndices.clear();
+                                  if (_routeStops.isEmpty) { _activeRouteStop = null; }
+                                  else { _activeRouteStop = (i < _routeStops.length ? i : _routeStops.length - 1); }
+                                }); },
+                              ),
+                              onTap: () {
+                                _suppressMapTaps();
+                                setState(() => _activeRouteStop = i);
+                                _mapController?.animateCamera(CameraUpdate.newLatLngZoom(pos, 17));
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   if (_routeStops.length >= _minRouteStops)
                     SizedBox(height: 46, child: ListView.builder(
                       scrollDirection: Axis.horizontal, itemCount: _routeStops.length,
@@ -364,10 +420,10 @@ class _MapPageState extends State<MapPage> {
                   });
                 },
               )),
-            ]))),
-            ),
+            ])))),
+            )),
           ),
-          Positioned(
+          if (!_routeMode) Positioned(
             left: 16,
             right: 16,
             top: _existingMode ? 340 : (_suggestions.isNotEmpty ? 330 : 160),

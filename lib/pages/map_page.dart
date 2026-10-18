@@ -350,7 +350,7 @@ class _MapPageState extends State<MapPage> {
                   });
                 },
               )),
-            ])))),
+            ]))),
           ),
           Positioned(
             left: 16,

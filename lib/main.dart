@@ -39,13 +39,14 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // The palette is read during every AnimatedBuilder rebuild.
-    final primary = AppPreferences.instance.accent;
-    final background = Color.alphaBlend(primary.withValues(alpha: 0.065), const Color(0xFFF7F2E9));
-
     return AnimatedBuilder(
       animation: AppPreferences.instance,
-      builder: (context, _) => MaterialApp(
+      builder: (context, _) {
+        // Read palette within the listener rebuild for instant switching.
+        final primary = AppPreferences.instance.accent;
+        final background = Color.alphaBlend(
+          primary.withValues(alpha: 0.065), const Color(0xFFF7F2E9));
+        return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: AppPreferences.instance.themeMode,
       locale: Locale(AppPreferences.instance.language),
@@ -125,6 +126,8 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
         appBarTheme: AppBarTheme(backgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.13), const Color(0xFF232228))),
       ),
       home: HomePage(assessmentState: widget.assessmentState),
-    ));
+    );
+      },
+    );
   }
 }

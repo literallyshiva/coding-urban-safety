@@ -43,6 +43,13 @@ class _MapPageState extends State<MapPage> {
   int? _activeRouteStop;
   static const int _minRouteStops = 3;
   static const int _maxRouteStops = 20;
+  // Ignore clicks that reach the map after interacting with overlay controls.
+  DateTime _ignoreMapTapsUntil = DateTime.fromMillisecondsSinceEpoch(0);
+
+  void _suppressMapTaps() {
+    _ignoreMapTapsUntil = DateTime.now().add(const Duration(milliseconds: 650));
+  }
+
   void _onSearchChanged(String query) {
     _searchDebounce?.cancel();
     ++_searchGeneration;
@@ -218,6 +225,7 @@ class _MapPageState extends State<MapPage> {
             },
             myLocationEnabled: !_manualMode && !_existingMode && location != null,
             onTap: (point) {
+              if (DateTime.now().isBefore(_ignoreMapTapsUntil)) return;
               if (_routeMode) { _addRouteStop(point); }
               else if (_manualMode) { setState(() { _selected = point; _placeId = null; }); }
             },
@@ -245,11 +253,17 @@ class _MapPageState extends State<MapPage> {
           ),
           Positioned(
             left: 16, right: 16, top: 12,
-            child: SafeArea(child: Material(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12), child: Column(children: [
+            child: Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: (_) => _suppressMapTaps(),
+              child: SafeArea(child: Material(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12), child: Column(children: [
               Wrap(spacing: 5, children: [
                 ChoiceChip(label: const Text('Route planner'), selected: _routeMode,
                   onSelected: (v) => setState(() { _routeMode = v; if (v) { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; } })),
-                if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () => setState(() { _routeStops.clear(); _activeRouteStop = null; }),
+                if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () {
+                  _suppressMapTaps();
+                  setState(() { _routeStops.clear(); _activeRouteStop = null; });
+                },
                   icon: const Icon(Icons.clear), label: const Text('Clear stops')),
                 ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _routeMode = false; _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
                 ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _routeMode = false; _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
@@ -351,6 +365,7 @@ class _MapPageState extends State<MapPage> {
                 },
               )),
             ]))),
+            ),
           ),
           Positioned(
             left: 16,

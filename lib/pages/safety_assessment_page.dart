@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
 import '../widgets/research_scaffold.dart';
+import '../widgets/animated_research_choices.dart';
 import 'ludic_assessment_page.dart';
 
 class SafetyAssessmentPage extends StatefulWidget {
@@ -31,6 +32,10 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
     'Traffic conflict',
     'Poor maintenance',
     'Inactive / blank edges',
+  ];
+
+  static const unsafeEmojis = [
+    '💡', '👁️', '🏜️', '🌙', '🚶', '🚦', '🧹', '🏚️',
   ];
 
   static const ratingLabels = [
@@ -68,59 +73,11 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
     );
   }
 
-  Widget _ratingOption(
-    AssessmentState state,
-    int rating,
-  ) {
-    final selected = state.safetyRating == rating;
-
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 3),
-        child: InkWell(
-          onTap: () => state.setSafetyRating(rating),
-          borderRadius: BorderRadius.circular(16),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(
-              vertical: 17,
-              horizontal: 3,
-            ),
-            decoration: BoxDecoration(
-              color: selected
-                  ? const Color(0xFFECEFEA)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: selected
-                    ? teal
-                    : const Color(0xFFDCDDD6),
-                width: selected ? 2 : 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  ratingIcons[rating - 1],
-                  color: selected
-                      ? teal
-                      : const Color(0xFF82908A),
-                  size: 30,
-                ),
-                const SizedBox(height: 9),
-                Text(
-                  '$rating',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: selected ? teal : navy,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+  Widget _ratingOption(AssessmentState state, int rating) {
+    return AnimatedResearchRating(
+      rating: rating,
+      selected: state.safetyRating == rating,
+      onTap: () => state.setSafetyRating(rating),
     );
   }
 
@@ -145,10 +102,10 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 mainAxisAlignment:
                     MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     '01 / SAFETY',
                     style: TextStyle(
-                      color: teal,
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
                     ),
@@ -156,7 +113,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   Text(
                     'Your perspective matters',
                     style: TextStyle(
-                      color: Colors.blueGrey.shade500,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   ),
@@ -167,12 +124,12 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
 
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 0.2,
                   minHeight: 6,
-                  backgroundColor: Color(0xFFE3E5DF),
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   valueColor:
-                      AlwaysStoppedAnimation<Color>(teal),
+                      AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                 ),
               ),
 
@@ -184,18 +141,18 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                     .textTheme
                     .headlineMedium
                     ?.copyWith(
-                      color: navy,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                     ),
               ),
 
               const SizedBox(height: 12),
 
-              const Text(
+              Text(
                 'Choose the feeling that best describes '
                 'this place.',
                 style: TextStyle(
-                  color: Color(0xFF667570),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -212,21 +169,21 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
 
               const SizedBox(height: 12),
 
-              const Row(
+              Row(
                 mainAxisAlignment:
                     MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Very Unsafe',
                     style: TextStyle(
-                      color: Color(0xFF667570),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     'Very Safe',
                     style: TextStyle(
-                      color: Color(0xFF667570),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   ),
@@ -239,7 +196,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECEFEA),
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius:
                         BorderRadius.circular(16),
                   ),
@@ -247,17 +204,17 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                     children: [
                       Text(
                         ratingLabels[rating - 1],
-                        style: const TextStyle(
-                          color: teal,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Your selected safety rating',
                         style: TextStyle(
-                          color: Color(0xFF667570),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 12,
                         ),
                       ),
@@ -268,17 +225,15 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
 
               const SizedBox(height: 36),
 
-              const Divider(
-                color: Color(0xFFDCDDD6),
-              ),
+              Divider(color: Theme.of(context).colorScheme.outlineVariant),
 
               const SizedBox(height: 24),
 
-              const Row(
+              Row(
                 children: [
                   Icon(
                     Icons.visibility_outlined,
-                    color: teal,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 26,
                   ),
                   SizedBox(width: 10),
@@ -286,7 +241,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                     child: Text(
                       'WHAT MAKES THIS PLACE FEEL UNSAFE?',
                       style: TextStyle(
-                        color: navy,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         height: 1.3,
@@ -298,51 +253,37 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
 
               const SizedBox(height: 10),
 
-              const Text(
+              Text(
                 'Select all that apply, or leave blank.',
                 style: TextStyle(
-                  color: Color(0xFF667570),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 14,
                 ),
               ),
 
               const SizedBox(height: 20),
 
-              Wrap(
-                spacing: 9,
-                runSpacing: 10,
-                children: unsafeOptions.map((option) {
-                  final selected =
-                      state.unsafeConditions.contains(option);
-
-                  return ChoiceChip(
-                    label: Text(option),
-                    selected: selected,
-                    onSelected: (_) =>
-                        state.toggleUnsafeCondition(option),
-                    showCheckmark: selected,
-                    checkmarkColor: teal,
-                    selectedColor:
-                        const Color(0xFFECEFEA),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(
-                      color: selected
-                          ? teal
-                          : const Color(0xFFDADDE4),
-                    ),
-                    labelStyle: TextStyle(
-                      color: selected ? teal : navy,
-                      fontWeight: selected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 9,
-                      vertical: 10,
-                    ),
-                  );
-                }).toList(),
-              ),
+              LayoutBuilder(builder: (context, constraints) {
+                final columns = constraints.maxWidth < 340 ? 1 : 2;
+                final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (var i = 0; i < unsafeOptions.length; i++)
+                      SizedBox(
+                        width: width,
+                        child: AnimatedResearchChoice(
+                          label: unsafeOptions[i],
+                          emoji: unsafeEmojis[i],
+                          delay: i * .13,
+                          selected: state.unsafeConditions.contains(unsafeOptions[i]),
+                          onTap: () => state.toggleUnsafeCondition(unsafeOptions[i]),
+                        ),
+                      ),
+                  ],
+                );
+              }),
 
               const SizedBox(height: 30),
             ],

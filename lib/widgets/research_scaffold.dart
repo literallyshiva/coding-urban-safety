@@ -32,7 +32,7 @@ class ResearchScaffold extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(width: 44, height: 2,
-                          color: const Color(0xFFD2A27B)),
+                          color: Theme.of(context).colorScheme.primary),
                         const SizedBox(height: 20),
                         child,
                       ],
@@ -48,7 +48,7 @@ class ResearchScaffold extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   border: Border(
-                    top: BorderSide(color: Color(0xFFDCDDD6)),
+                    top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                   ),
                 ),
                 child: SafeArea(top: false, child: bottomButton!),

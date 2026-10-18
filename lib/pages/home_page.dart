@@ -34,6 +34,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textColor = colors.onSurface;
+    final secondary = colors.onSurfaceVariant;
     return ResearchScaffold(
       showFieldNote: false,
       child: Padding(
@@ -43,45 +46,47 @@ class HomePage extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.grid_on_rounded, size: 19, color: sage),
+                Icon(Icons.grid_on_rounded, size: 19, color: colors.primary),
                 const SizedBox(width: 9),
-                const Expanded(
+                Expanded(
                   child: Text('FIELD NOTES  /  URBAN RESEARCH',
                     style: TextStyle(fontSize: 11, letterSpacing: 1.7,
-                      fontWeight: FontWeight.w700, color: sage)),
+                      fontWeight: FontWeight.w700, color: secondary)),
                 ),
                 IconButton(
                   tooltip: 'Researcher access',
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const ResearchDashboardPage())),
-                  icon: const Icon(Icons.lock_outline, size: 20, color: ink),
+                  icon: Icon(Icons.lock_outline, size: 20, color: textColor),
                 ),
               ],
             ),
             const SizedBox(height: 25),
-            const Text('01  /  INTRODUCTION',
+            Text('01  /  INTRODUCTION',
               style: TextStyle(fontSize: 11, letterSpacing: 2,
-                fontWeight: FontWeight.w700, color: sage)),
+                fontWeight: FontWeight.w700, color: colors.primary)),
             const SizedBox(height: 13),
             Text(AppPreferences.instance.tr('How do we\nexperience\nour cities?', 'നമ്മുടെ നഗരങ്ങളെ\nനാം എങ്ങനെ\nഅനുഭവിക്കുന്നു?'),
-              style: TextStyle(fontSize: 47, height: 1.06,
-                fontWeight: FontWeight.w500, letterSpacing: -2.0, color: ink)),
+              style: TextStyle(fontSize: 42, height: 1.23,
+                fontWeight: FontWeight.w600, letterSpacing: -0.7, color: textColor)),
             const SizedBox(height: 20),
             Container(height: 2, width: 65, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 21),
             Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
-              style: TextStyle(fontSize: 17, height: 1.55, color: ink)),
+              style: TextStyle(fontSize: 17, height: 1.55, color: textColor)),
             const SizedBox(height: 27),
             const _ArchitecturalIllustration(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
+            const _ExploreResearchCard(),
+            const SizedBox(height: 22),
             const Wrap(spacing: 8, runSpacing: 8, children: [
-              _Keyword('01  SAFETY'),
-              _Keyword('02  PUBLIC SPACE'),
-              _Keyword('03  EXPLORATION'),
+              _Keyword('🛡️  SAFETY'),
+              _Keyword('🏙️  PUBLIC SPACE'),
+              _Keyword('🧭  EXPLORATION'),
             ]),
             const SizedBox(height: 23),
             Text(AppPreferences.instance.tr('Every place has a story. Your observations can help us understand how public spaces feel and function.', 'ഓരോ ഇടത്തിനും ഒരു കഥയുണ്ട്. നിങ്ങളുടെ നിരീക്ഷണങ്ങൾ പൊതു ഇടങ്ങളെ മനസ്സിലാക്കാൻ സഹായിക്കും.'),
-              style: TextStyle(fontSize: 14, height: 1.65, color: ink)),
+              style: TextStyle(fontSize: 14, height: 1.65, color: secondary)),
             const SizedBox(height: 26),
             SizedBox(
               width: double.infinity,
@@ -104,16 +109,16 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 18),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: ivory,
-                        border: Border.all(color: line)),
+                      decoration: BoxDecoration(color: colors.surfaceContainerHigh,
+                        border: Border.all(color: colors.outlineVariant), borderRadius: BorderRadius.circular(12)),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('UNFINISHED FIELD NOTE',
-                            style: TextStyle(color: sage, fontSize: 11,
+                          Text('UNFINISHED FIELD NOTE',
+                            style: TextStyle(color: colors.primary, fontSize: 11,
                               fontWeight: FontWeight.w700, letterSpacing: 1.5)),
                           const SizedBox(height: 6),
-                          const Text('Your progress is saved on this device.',
-                            style: TextStyle(color: ink, fontSize: 13)),
+                          Text('Your progress is saved on this device.',
+                            style: TextStyle(color: textColor, fontSize: 13)),
                           const SizedBox(height: 6),
                           TextButton.icon(onPressed: () => _resume(context),
                             icon: const Icon(Icons.arrow_forward, size: 18),
@@ -129,14 +134,14 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 25),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: const BoxDecoration(border: Border(top: BorderSide(color: line))),
-              child: const Row(crossAxisAlignment: CrossAxisAlignment.start,
+              decoration: BoxDecoration(border: Border(top: BorderSide(color: colors.outlineVariant))),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.lock_outline, color: sage, size: 18),
-                  SizedBox(width: 12),
+                  Icon(Icons.lock_outline, color: colors.primary, size: 18),
+                  const SizedBox(width: 12),
                   Expanded(child: Text(
                     'RESEARCH PRIVACY  /  Information submitted is intended solely for research purposes. Please avoid names or other identifying details.',
-                    style: TextStyle(fontSize: 12, height: 1.6, color: sage))),
+                    style: TextStyle(fontSize: 12, height: 1.6, color: secondary))),
                 ],
               ),
             ),
@@ -153,9 +158,13 @@ class _Keyword extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    decoration: BoxDecoration(border: Border.all(color: HomePage.line)),
-    child: Text(label, style: const TextStyle(fontSize: 10,
-      fontWeight: FontWeight.w700, letterSpacing: 1, color: HomePage.sage)),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      borderRadius: BorderRadius.circular(9),
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant)),
+    child: Text(label, style: TextStyle(fontSize: 10,
+      fontWeight: FontWeight.w700, letterSpacing: 0.7,
+      color: Theme.of(context).colorScheme.onSurface)),
   );
 }
 
@@ -167,7 +176,7 @@ class _ArchitecturalIllustration extends StatelessWidget {
     width: double.infinity,
     decoration: BoxDecoration(
       color: Colors.white,
-      border: Border.all(color: HomePage.line),
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
     ),
     child: ClipRect(
       child: Image.asset(
@@ -179,4 +188,103 @@ class _ArchitecturalIllustration extends StatelessWidget {
       ),
     ),
   );
+}
+
+
+/// Interactive infographic on the landing page. Purely local UI; no research data is changed.
+class _ExploreResearchCard extends StatefulWidget {
+  const _ExploreResearchCard();
+  @override
+  State<_ExploreResearchCard> createState() => _ExploreResearchCardState();
+}
+
+class _ExploreResearchCardState extends State<_ExploreResearchCard> {
+  int selected = 0;
+  static const emojis = ['🛡️', '🚶', '✨'];
+  static const headings = ['Safety', 'Movement', 'Your voice'];
+  static const descriptions = [
+    'Notice how comfortable, welcoming and safe each place feels.',
+    'Explore accessibility, movement and the ways people use public space.',
+    'Share your experience to help researchers understand better cities.',
+  ];
+  static const descriptionsMl = [
+    'ഓരോ ഇടവും എത്രത്തോളം സുരക്ഷിതവും സൗകര്യപ്രദവുമാണെന്ന് വിലയിരുത്തൂ.',
+    'പൊതു ഇടങ്ങളിലെ സഞ്ചാരവും ഉപയോഗവും ശ്രദ്ധിക്കൂ.',
+    'നഗരങ്ങളെ മെച്ചമായി മനസ്സിലാക്കാൻ നിങ്ങളുടെ അനുഭവം പങ്കുവയ്ക്കൂ.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final c = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: c.surfaceContainerLow,
+        border: Border.all(color: c.outlineVariant),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.auto_graph_rounded, color: c.primary, size: 19),
+          const SizedBox(width: 9),
+          Expanded(child: Text('EXPLORE THE STUDY', style: TextStyle(
+            fontSize: 12, letterSpacing: 1.1, fontWeight: FontWeight.w800,
+            color: c.onSurface))),
+          Text('${selected + 1} / 3', style: TextStyle(
+            fontWeight: FontWeight.w700, color: c.onSurfaceVariant)),
+        ]),
+        const SizedBox(height: 14),
+        Row(children: List.generate(3, (i) => Expanded(
+          child: Padding(padding: EdgeInsets.only(right: i == 2 ? 0 : 6),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 280), height: 5,
+              decoration: BoxDecoration(
+                color: i <= selected ? c.primary : c.outlineVariant,
+                borderRadius: BorderRadius.circular(6))),
+          ),
+        ))),
+        const SizedBox(height: 14),
+        Row(children: List.generate(3, (i) => Expanded(
+          child: Padding(padding: EdgeInsets.only(right: i == 2 ? 0 : 8),
+            child: Semantics(button: true, selected: selected == i,
+              label: 'Explore ${headings[i]}',
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => setState(() => selected = i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 260),
+                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: selected == i ? c.primaryContainer : c.surfaceContainerHighest),
+                  child: Column(children: [
+                    TweenAnimationBuilder<double>(
+                      key: ValueKey('emoji-$i-${selected == i}'),
+                      tween: Tween(begin: selected == i ? 0.75 : 1.0, end: 1.0),
+                      duration: const Duration(milliseconds: 480),
+                      curve: Curves.elasticOut,
+                      builder: (context, scale, child) =>
+                        Transform.scale(scale: scale, child: child),
+                      child: Text(emojis[i], style: const TextStyle(fontSize: 31)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(headings[i], textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
+                        color: selected == i ? c.onPrimaryContainer : c.onSurface)),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ))),
+        const SizedBox(height: 14),
+        AnimatedSwitcher(duration: const Duration(milliseconds: 240),
+          child: Text(
+            AppPreferences.instance.language == 'ml'
+                ? descriptionsMl[selected] : descriptions[selected],
+            key: ValueKey('${AppPreferences.instance.language}-$selected'),
+            style: TextStyle(fontSize: 13, height: 1.5, color: c.onSurfaceVariant))),
+      ]),
+    );
+  }
 }

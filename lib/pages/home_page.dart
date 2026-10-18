@@ -76,7 +76,7 @@ class HomePage extends StatelessWidget {
             Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
               style: TextStyle(fontSize: 17, height: 1.55, color: textColor)),
             const SizedBox(height: 27),
-            const _ArchitecturalIllustration(),
+            const _AnimatedCityHero(),
             const SizedBox(height: 22),
             const _ExploreResearchCard(),
             const SizedBox(height: 22),
@@ -167,6 +167,54 @@ class _Keyword extends StatelessWidget {
       fontWeight: FontWeight.w700, letterSpacing: 0.7,
       color: Theme.of(context).colorScheme.onSurface)),
   );
+}
+
+
+/// Retains the original research artwork; adds moving, accessible city details.
+class _AnimatedCityHero extends StatefulWidget {
+  const _AnimatedCityHero();
+  @override
+  State<_AnimatedCityHero> createState() => _AnimatedCityHeroState();
+}
+
+class _AnimatedCityHeroState extends State<_AnimatedCityHero>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _motion = AnimationController(
+    vsync: this, duration: const Duration(seconds: 9))..repeat();
+
+  @override
+  void dispose() { _motion.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = Theme.of(context).colorScheme;
+    final reduced = MediaQuery.of(context).disableAnimations;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Stack(children: [
+        const _ArchitecturalIllustration(),
+        Positioned(top: 10, right: 12,
+          child: DecoratedBox(decoration: BoxDecoration(
+            color: c.surface.withValues(alpha: .92),
+            borderRadius: BorderRadius.circular(20)),
+            child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text('🏙️  Explore your city',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
+                  color: c.onSurface))))),
+        if (!reduced)
+          Positioned.fill(child: IgnorePointer(child: AnimatedBuilder(
+            animation: _motion,
+            builder: (context, _) => Align(
+              alignment: Alignment(-1.15 + 2.3 * _motion.value, .68),
+              child: const Text('🚶', style: TextStyle(fontSize: 30)),
+            ),
+          ))),
+        if (reduced)
+          const Positioned(bottom: 10, left: 16,
+            child: Text('🚶', style: TextStyle(fontSize: 26))),
+      ]),
+    );
+  }
 }
 
 class _ArchitecturalIllustration extends StatelessWidget {

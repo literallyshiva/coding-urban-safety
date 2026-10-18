@@ -312,7 +312,7 @@ class _MapPageState extends State<MapPage> {
                       ),
                     )),
                 ]),
-              )),
+              ),
               if (_searchError != null)
                 Padding(padding: const EdgeInsets.all(8),
                   child: Text(_searchError!, style: const TextStyle(color: Colors.red))),
@@ -350,7 +350,7 @@ class _MapPageState extends State<MapPage> {
                   });
                 },
               )),
-            ]))),
+            ])))),
           ),
           Positioned(
             left: 16,

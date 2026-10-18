@@ -112,7 +112,7 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: primary, width: 1.5),
+            borderSide: BorderSide(color: primary, width: 1.5),
           ),
           contentPadding: const EdgeInsets.all(16),
         ),

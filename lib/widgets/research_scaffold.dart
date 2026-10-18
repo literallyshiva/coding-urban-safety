@@ -163,15 +163,28 @@ class AppSettingsButton extends StatelessWidget {
       tooltip: 'Theme and language / തീമും ഭാഷയും',
       icon: const Icon(Icons.settings_outlined),
       onSelected: (value) {
-        if (value == 'light') AppPreferences.instance.setTheme(ThemeMode.light);
-        if (value == 'dark') AppPreferences.instance.setTheme(ThemeMode.dark);
-        if (value == 'system') AppPreferences.instance.setTheme(ThemeMode.system);
-        if (value == 'en' || value == 'ml') AppPreferences.instance.setLanguage(value);
+        if (value.startsWith('theme:')) {
+          AppPreferences.instance.setSelectedTheme(value.substring(6));
+        } else if (value == 'en' || value == 'ml') {
+          AppPreferences.instance.setLanguage(value);
+        }
       },
       itemBuilder: (_) => const [
-        PopupMenuItem(value: 'system', child: Text('Theme: System')),
-        PopupMenuItem(value: 'light', child: Text('☀ Light / പകൽ')),
-        PopupMenuItem(value: 'dark', child: Text('☾ Dark / രാത്രി')),
+        PopupMenuItem(enabled: false, child: Text('LIGHT THEMES')),
+        PopupMenuItem(value: 'theme:beige', child: Text('🏖 Beige & ivory (default)')),
+        PopupMenuItem(value: 'theme:sage', child: Text('🌿 Sage & cream')),
+        PopupMenuItem(value: 'theme:ocean', child: Text('🌊 Ocean & sky')),
+        PopupMenuItem(value: 'theme:sunset', child: Text('🌅 Sunset & sand')),
+        PopupMenuItem(value: 'theme:lavender', child: Text('💜 Lavender & pearl')),
+        PopupMenuItem(value: 'theme:forest', child: Text('🌲 Forest & mint')),
+        PopupMenuDivider(),
+        PopupMenuItem(enabled: false, child: Text('DARK THEMES')),
+        PopupMenuItem(value: 'theme:dark-beige', child: Text('🌙 Dark beige & bronze')),
+        PopupMenuItem(value: 'theme:dark-sage', child: Text('🌙 Dark sage')),
+        PopupMenuItem(value: 'theme:dark-ocean', child: Text('🌙 Dark ocean')),
+        PopupMenuItem(value: 'theme:dark-sunset', child: Text('🌙 Dark sunset')),
+        PopupMenuItem(value: 'theme:dark-lavender', child: Text('🌙 Dark lavender')),
+        PopupMenuItem(value: 'theme:dark-forest', child: Text('🌙 Dark forest')),
         PopupMenuDivider(),
         PopupMenuItem(value: 'en', child: Text('English')),
         PopupMenuItem(value: 'ml', child: Text('മലയാളം')),

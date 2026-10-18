@@ -39,8 +39,9 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF647C77);
-    const background = Color(0xFFF6F4EF);
+    // The palette is read during every AnimatedBuilder rebuild.
+    final primary = AppPreferences.instance.accent;
+    final background = Color.alphaBlend(primary.withValues(alpha: 0.065), const Color(0xFFF7F2E9));
 
     return AnimatedBuilder(
       animation: AppPreferences.instance,
@@ -54,13 +55,13 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
         colorScheme: ColorScheme.fromSeed(
           seedColor: primary,
           brightness: Brightness.light,
-          surface: Colors.white,
+          surface: Color.alphaBlend(primary.withValues(alpha: 0.035), const Color(0xFFFFFCF6)),
         ),
         scaffoldBackgroundColor: background,
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           centerTitle: false,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.06), const Color(0xFFFFFCF6)),
           foregroundColor: Color(0xFF202A30),
           titleTextStyle: TextStyle(
             color: Color(0xFF202A30),
@@ -112,7 +113,7 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: primary, width: 1.5),
+            borderSide: BorderSide(color: primary, width: 1.5),
           ),
           contentPadding: const EdgeInsets.all(16),
         ),
@@ -120,8 +121,8 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: primary, brightness: Brightness.dark),
-        scaffoldBackgroundColor: const Color(0xFF151C1C),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1D2928)),
+        scaffoldBackgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.10), const Color(0xFF17171B)),
+        appBarTheme: AppBarTheme(backgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.13), const Color(0xFF232228))),
       ),
       home: HomePage(assessmentState: widget.assessmentState),
     ));

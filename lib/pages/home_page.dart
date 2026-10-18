@@ -67,7 +67,7 @@ class HomePage extends StatelessWidget {
               style: TextStyle(fontSize: 47, height: 1.06,
                 fontWeight: FontWeight.w500, letterSpacing: -2.0, color: ink)),
             const SizedBox(height: 20),
-            Container(height: 2, width: 65, color: clay),
+            Container(height: 2, width: 65, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 21),
             Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
               style: TextStyle(fontSize: 17, height: 1.55, color: ink)),
@@ -88,7 +88,7 @@ class HomePage extends StatelessWidget {
               height: 55,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: ink, foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
                 onPressed: () => _start(context),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center,

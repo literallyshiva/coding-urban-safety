@@ -1,3 +1,4 @@
+import '../widgets/research_progress.dart';
 
 import 'package:flutter/material.dart';
 
@@ -199,6 +200,8 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
         builder: (_, __) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+              const ResearchProgress(stage: 1),
+              const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

@@ -146,6 +146,19 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('EXPLORE ASSESSMENTS', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 12),
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        ActionChip(avatar: const Icon(Icons.filter_alt_off, size: 16),
+          label: const Text('Reset filters'),
+          onPressed: () => setState(() {
+            _daysBack = 0; _gender = 'All'; _condition = 'All';
+            _minimumSafety = 0; _selectedPlaceId = null;
+          })),
+        FilterChip(label: const Text('Last 7 days'), selected: _daysBack == 7,
+          onSelected: (v) => setState(() => _daysBack = v ? 7 : 0)),
+        FilterChip(label: const Text('Safety 1 / 5'), selected: _minimumSafety == 1,
+          onSelected: (v) => setState(() => _minimumSafety = v ? 1 : 0)),
+      ]),
+      const SizedBox(height: 12),
       Wrap(spacing: 12, runSpacing: 10, children: [
         DropdownButton<int>(value: _daysBack,
           items: const [DropdownMenuItem(value: 0, child: Text('All loaded dates')),
@@ -170,6 +183,14 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
       Text('${_filtered.length} matching assessments across ${places.length} places',
           style: Theme.of(context).textTheme.bodyMedium),
       const SizedBox(height: 14),
+      Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('🗺️  RESEARCH MAP', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 5),
+          Text('Tap a marker to inspect a place. Filters update the map and charts together.',
+            style: Theme.of(context).textTheme.bodySmall),
+        ]))),
+      const SizedBox(height: 10),
       if (firstPoint != null)
         SizedBox(height: 330, child: ClipRRect(
           borderRadius: BorderRadius.circular(8),

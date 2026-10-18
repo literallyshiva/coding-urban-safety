@@ -39,8 +39,8 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF647C77);
-    const background = Color(0xFFF6F4EF);
+    final primary = AppPreferences.instance.accent;
+    final background = Color.alphaBlend(primary.withValues(alpha: 0.045), const Color(0xFFF6F4EF));
 
     return AnimatedBuilder(
       animation: AppPreferences.instance,
@@ -57,10 +57,10 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
           surface: Colors.white,
         ),
         scaffoldBackgroundColor: background,
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           centerTitle: false,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.06), Colors.white),
           foregroundColor: Color(0xFF202A30),
           titleTextStyle: TextStyle(
             color: Color(0xFF202A30),

@@ -40,6 +40,9 @@ class _MapPageState extends State<MapPage> {
   int _searchGeneration = 0;
   final List<LatLng> _routeStops = [];
   bool _routeMode = false;
+  int? _activeRouteStop;
+  static const int _minRouteStops = 3;
+  static const int _maxRouteStops = 20;
   void _onSearchChanged(String query) {
     _searchDebounce?.cancel();
     ++_searchGeneration;
@@ -50,7 +53,10 @@ class _MapPageState extends State<MapPage> {
     _searchDebounce = Timer(const Duration(milliseconds: 450), _searchPlaces);
   }
   void _addRouteStop(LatLng point) => setState(() {
-    if (_routeStops.length < 20) _routeStops.add(point);
+    if (_routeStops.length < _maxRouteStops) {
+      _routeStops.add(point);
+      _activeRouteStop = _routeStops.length - 1;
+    }
   });
   String? _searchError;
 
@@ -170,7 +176,12 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _assessPlace() async {
-    if (!_manualMode && !_existingMode) {
+    if (_routeMode) {
+      if (_routeStops.length < _minRouteStops) return;
+      final index = _activeRouteStop ?? (_routeStops.length - 1);
+      if (index < 0 || index >= _routeStops.length) return;
+      widget.assessmentState.selectPlace(_routeStops[index], source: 'manual');
+    } else if (!_manualMode && !_existingMode) {
       widget.assessmentState.location = null;
       await _captureCurrentLocation();
     } else if (_selected != null) {
@@ -219,7 +230,11 @@ class _MapPageState extends State<MapPage> {
             markers: {
               for (var i = 0; i < _routeStops.length; i++)
                 Marker(markerId: MarkerId('stop-$i'), position: _routeStops[i],
-                  infoWindow: InfoWindow(title: 'Research stop ${i + 1}')),
+                  infoWindow: InfoWindow(title: 'Research stop ${i + 1}',
+                    snippet: 'Tap marker to select this stop for assessment'),
+                  onTap: () => setState(() => _activeRouteStop = i),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    _activeRouteStop == i ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed)),
               if (location != null)
                     Marker(
                       markerId: const MarkerId('assessment-location'),
@@ -234,11 +249,11 @@ class _MapPageState extends State<MapPage> {
               Wrap(spacing: 5, children: [
                 ChoiceChip(label: const Text('Route planner'), selected: _routeMode,
                   onSelected: (v) => setState(() { _routeMode = v; if (v) { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; } })),
-                if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () => setState(() => _routeStops.clear()),
+                if (_routeMode) TextButton.icon(onPressed: _routeStops.isEmpty ? null : () => setState(() { _routeStops.clear(); _activeRouteStop = null; }),
                   icon: const Icon(Icons.clear), label: const Text('Clear stops')),
-                ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
-                ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
-                ChoiceChip(label: const Text('Existing places'), selected: _existingMode, onSelected: (_) => setState(() { _manualMode = false; _existingMode = true; _selected = null; _placeId = null; })),
+                ChoiceChip(label: const Text('My GPS'), selected: !_manualMode && !_existingMode, onSelected: (_) { setState(() { _routeMode = false; _manualMode = false; _existingMode = false; _selected = null; _placeId = null; }); _captureCurrentLocation(); }),
+                ChoiceChip(label: const Text('New place'), selected: _manualMode, onSelected: (_) => setState(() { _routeMode = false; _manualMode = true; _existingMode = false; _selected = null; _placeId = null; })),
+                ChoiceChip(label: const Text('Existing places'), selected: _existingMode, onSelected: (_) => setState(() { _routeMode = false; _manualMode = false; _existingMode = true; _selected = null; _placeId = null; })),
               ]),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -265,9 +280,39 @@ class _MapPageState extends State<MapPage> {
                 ]),
               ),
               if (_routeMode) Padding(padding: const EdgeInsets.all(8), child: Text(
-                'Tap map or choose search results to add stops (${_routeStops.length}/20). '
-                'Lines connect waypoints directly; they are NOT road-following walking directions.',
+                '${_routeStops.length} stops selected · At least 3 to start assessing · Maximum 20. '
+                'Tap a pin or choose a stop below to assess it. Lines are straight, not walking directions.',
                 style: const TextStyle(fontSize: 12))),
+              if (_routeMode) Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    const Icon(Icons.route_outlined, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(child: LinearProgressIndicator(
+                      value: (_routeStops.length / _minRouteStops).clamp(0.0, 1.0),
+                      minHeight: 9, borderRadius: BorderRadius.circular(8))),
+                    const SizedBox(width: 8),
+                    Text('${_routeStops.length}/$_minRouteStops ready'),
+                  ]),
+                  if (_routeStops.length >= _minRouteStops)
+                    SizedBox(height: 46, child: ListView.builder(
+                      scrollDirection: Axis.horizontal, itemCount: _routeStops.length,
+                      itemBuilder: (context, i) => Padding(
+                        padding: const EdgeInsets.only(right: 6, top: 6),
+                        child: ChoiceChip(
+                          label: Text('Stop ${i + 1}'),
+                          selected: _activeRouteStop == i,
+                          onSelected: (_) {
+                            setState(() => _activeRouteStop = i);
+                            _mapController?.animateCamera(
+                              CameraUpdate.newLatLngZoom(_routeStops[i], 16));
+                          },
+                        ),
+                      ),
+                    )),
+                ]),
+              )),
               if (_searchError != null)
                 Padding(padding: const EdgeInsets.all(8),
                   child: Text(_searchError!, style: const TextStyle(color: Colors.red))),
@@ -358,9 +403,11 @@ class _MapPageState extends State<MapPage> {
             child: SafeArea(
               top: false,
               child: PrimaryActionButton(
-                label: AppPreferences.instance.tr('ASSESS A PLACE', 'ഇടം വിലയിരുത്തുക'),
+                label: _routeMode ? 'ASSESS SELECTED STOP' : AppPreferences.instance.tr('ASSESS A PLACE', 'ഇടം വിലയിരുത്തുക'),
                 loading: !_manualMode && !_existingMode && _loadingLocation,
-                onPressed: _routeMode || ((_manualMode || _existingMode) && location == null) ? null : _assessPlace,
+                onPressed: (_routeMode && _routeStops.length < _minRouteStops) ||
+                    (!_routeMode && (_manualMode || _existingMode) && location == null)
+                    ? null : _assessPlace,
               ),
             ),
           ),

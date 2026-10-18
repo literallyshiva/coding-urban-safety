@@ -166,12 +166,20 @@ class AppSettingsButton extends StatelessWidget {
         if (value == 'light') AppPreferences.instance.setTheme(ThemeMode.light);
         if (value == 'dark') AppPreferences.instance.setTheme(ThemeMode.dark);
         if (value == 'system') AppPreferences.instance.setTheme(ThemeMode.system);
+        if (value.startsWith('palette:')) AppPreferences.instance.setPalette(value.substring(8));
         if (value == 'en' || value == 'ml') AppPreferences.instance.setLanguage(value);
       },
       itemBuilder: (_) => const [
         PopupMenuItem(value: 'system', child: Text('Theme: System')),
         PopupMenuItem(value: 'light', child: Text('☀ Light / പകൽ')),
         PopupMenuItem(value: 'dark', child: Text('☾ Dark / രാത്രി')),
+        PopupMenuDivider(),
+        PopupMenuItem(enabled: false, child: Text('COLOUR PALETTES')),
+        PopupMenuItem(value: 'palette:sage', child: Text('🌿 Sage & cream')),
+        PopupMenuItem(value: 'palette:ocean', child: Text('🌊 Ocean & sky')),
+        PopupMenuItem(value: 'palette:sunset', child: Text('🌅 Sunset & sand')),
+        PopupMenuItem(value: 'palette:lavender', child: Text('💜 Lavender & pearl')),
+        PopupMenuItem(value: 'palette:forest', child: Text('🌲 Forest & mint')),
         PopupMenuDivider(),
         PopupMenuItem(value: 'en', child: Text('English')),
         PopupMenuItem(value: 'ml', child: Text('മലയാളം')),

@@ -185,6 +185,8 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
           'Markers show only places within the loaded assessment sample.',
           style: TextStyle(fontSize: 12)),
       const SizedBox(height: 24),
+      _safetyOverview(),
+      const SizedBox(height: 24),
       _ratingChart(),
       const SizedBox(height: 20),
       _comparison(places),
@@ -241,6 +243,41 @@ small{color:#555} @media print{body{margin:20mm}}</style></head><body>
     );
   }
 
+
+  Widget _safetyOverview() {
+    final ratings = _filtered.map((r) => r.data()['safety_rating']).whereType<num>().toList();
+    final low = ratings.where((v) => v < 2.5).length;
+    final moderate = ratings.where((v) => v >= 2.5 && v < 3.5).length;
+    final high = ratings.where((v) => v >= 3.5).length;
+    final total = ratings.length;
+    final theme = Theme.of(context);
+    Widget category(String label, int count, Color color) => Expanded(
+      child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('$count', style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold, color: color)),
+          Text(label, style: theme.textTheme.bodySmall),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(value: total == 0 ? 0 : count / total,
+            color: color, minHeight: 10, borderRadius: BorderRadius.circular(6)),
+        ],
+      )),
+    );
+    return Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('SAFETY SNAPSHOT', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 6),
+        Text('Distribution of $total rated assessments in the current filters',
+          style: theme.textTheme.bodySmall),
+        const SizedBox(height: 16),
+        Row(children: [
+          category('Needs attention', low, const Color(0xFFC46A60)),
+          category('Mixed', moderate, const Color(0xFFC79A51)),
+          category('Positive', high, const Color(0xFF638B78)),
+        ]),
+      ],
+    )));
+  }
 
   Widget _ratingChart() {
     final counts = List<int>.filled(5, 0);

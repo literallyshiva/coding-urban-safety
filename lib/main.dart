@@ -39,8 +39,9 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // The palette is read during every AnimatedBuilder rebuild.
     final primary = AppPreferences.instance.accent;
-    final background = Color.alphaBlend(primary.withValues(alpha: 0.045), const Color(0xFFF6F4EF));
+    final background = Color.alphaBlend(primary.withValues(alpha: 0.09), const Color(0xFFF6F4EF));
 
     return AnimatedBuilder(
       animation: AppPreferences.instance,
@@ -54,7 +55,7 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
         colorScheme: ColorScheme.fromSeed(
           seedColor: primary,
           brightness: Brightness.light,
-          surface: Colors.white,
+          surface: Color.alphaBlend(primary.withValues(alpha: 0.035), Colors.white),
         ),
         scaffoldBackgroundColor: background,
         appBarTheme: AppBarTheme(
@@ -120,8 +121,8 @@ class _CodingUrbanSafetyAppState extends State<CodingUrbanSafetyApp> {
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: primary, brightness: Brightness.dark),
-        scaffoldBackgroundColor: const Color(0xFF151C1C),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1D2928)),
+        scaffoldBackgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.10), const Color(0xFF151C1C)),
+        appBarTheme: AppBarTheme(backgroundColor: Color.alphaBlend(primary.withValues(alpha: 0.13), const Color(0xFF1D2928))),
       ),
       home: HomePage(assessmentState: widget.assessmentState),
     ));

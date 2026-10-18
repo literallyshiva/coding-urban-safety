@@ -225,7 +225,7 @@ class _MapPageState extends State<MapPage> {
             zoomControlsEnabled: false,
             polylines: _routeStops.length < 2 ? {} : {
               Polyline(polylineId: const PolylineId('research-route'),
-                points: _routeStops, color: const Color(0xFF647C77), width: 4),
+                points: _routeStops, color: Theme.of(context).colorScheme.primary, width: 4),
             },
             markers: {
               for (var i = 0; i < _routeStops.length; i++)

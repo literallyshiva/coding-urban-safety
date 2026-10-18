@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../state/assessment_state.dart';
 import '../widgets/research_scaffold.dart';
+import '../widgets/animated_research_emoji.dart';
 import 'spatial_assessment_page.dart';
 
 class LudicAssessmentPage extends StatefulWidget {
@@ -40,6 +41,8 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
     Icons.auto_awesome,
   ];
 
+  static const experienceEmojis = ['🚶', '🛋️', '🫂', '🛤️', '🧭', '✨'];
+  static const spendEmojis = ['💚', '🤔', '➡️'];
   static const spendOptions = ['YES', 'MAYBE', 'NO'];
 
   static const spendIcons = [
@@ -75,6 +78,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
   ) {
     final option = experienceOptions[index];
     final selected = state.placeExperience.contains(option);
+    final scheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () => state.togglePlaceExperience(option),
@@ -84,14 +88,14 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
         padding: const EdgeInsets.all(16),
         constraints: const BoxConstraints(minHeight: 112),
         decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xFFECEFEA)
-              : const Color(0xFFF6F4EF),
+          gradient: LinearGradient(
+            colors: selected
+              ? [scheme.primaryContainer, scheme.tertiaryContainer]
+              : [scheme.surfaceContainerLow, scheme.secondaryContainer.withValues(alpha: 0.5)],
+          ),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected
-                ? teal
-                : const Color(0xFFDCDDD6),
+            color: selected ? scheme.primary : scheme.outlineVariant,
             width: selected ? 2 : 1,
           ),
         ),
@@ -102,24 +106,19 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  experienceIcons[index],
-                  color: teal,
-                  size: 27,
+                AnimatedResearchEmoji(
+                  emoji: experienceEmojis[index], size: 32,
+                  delay: index * 0.13,
                 ),
                 if (selected)
-                  const Icon(
-                    Icons.check_circle,
-                    color: teal,
-                    size: 21,
-                  ),
+                  Icon(Icons.check_circle, color: scheme.primary, size: 21),
               ],
             ),
             const SizedBox(height: 16),
             Text(
               option,
-              style: const TextStyle(
-                color: navy,
+              style: TextStyle(
+                color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 height: 1.3,
@@ -137,6 +136,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
   ) {
     final option = spendOptions[index];
     final selected = state.spendMoreTime == option;
+    final scheme = Theme.of(context).colorScheme;
 
     return Expanded(
       child: Padding(
@@ -151,31 +151,28 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
               horizontal: 4,
             ),
             decoration: BoxDecoration(
-              color: selected
-                  ? const Color(0xFFECEFEA)
-                  : const Color(0xFFF6F4EF),
+              gradient: LinearGradient(
+                colors: selected
+                  ? [scheme.primaryContainer, scheme.tertiaryContainer]
+                  : [scheme.surfaceContainerLow, scheme.secondaryContainer.withValues(alpha: 0.5)],
+              ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: selected
-                    ? teal
-                    : const Color(0xFFDCDDD6),
+                color: selected ? scheme.primary : scheme.outlineVariant,
                 width: selected ? 2 : 1,
               ),
             ),
             child: Column(
               children: [
-                Icon(
-                  spendIcons[index],
-                  color: selected
-                      ? teal
-                      : const Color(0xFF82908A),
-                  size: 28,
+                AnimatedResearchEmoji(
+                  emoji: spendEmojis[index], size: 32,
+                  delay: index * 0.19,
                 ),
                 const SizedBox(height: 10),
                 Text(
                   option,
                   style: TextStyle(
-                    color: selected ? teal : navy,
+                    color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                   ),
@@ -202,13 +199,13 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
         builder: (_, __) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '02 / EXPERIENCE',
                   style: TextStyle(
-                    color: teal,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
                   ),
@@ -216,7 +213,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                 Text(
                   'Your perspective matters',
                   style: TextStyle(
-                    color: Color(0xFF82908A),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),
@@ -227,12 +224,11 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
 
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: const LinearProgressIndicator(
+              child: LinearProgressIndicator(
                 value: 0.4,
                 minHeight: 6,
                 backgroundColor: Color(0xFFE3E5DF),
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(teal),
+                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
               ),
             ),
 
@@ -244,18 +240,18 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                   .textTheme
                   .headlineMedium
                   ?.copyWith(
-                    color: navy,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
                   ),
             ),
 
             const SizedBox(height: 12),
 
-            const Text(
+            Text(
               'Tell us how this space invites you to '
               'move, explore and connect.',
               style: TextStyle(
-                color: Color(0xFF667570),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -263,11 +259,11 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
 
             const SizedBox(height: 30),
 
-            const Row(
+            Row(
               children: [
                 Icon(
                   Icons.explore_outlined,
-                  color: teal,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 26,
                 ),
                 SizedBox(width: 10),
@@ -275,7 +271,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                   child: Text(
                     'WHAT DOES THIS PLACE ENCOURAGE YOU TO DO?',
                     style: TextStyle(
-                      color: navy,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       height: 1.3,
@@ -287,10 +283,10 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
 
             const SizedBox(height: 10),
 
-            const Text(
+            Text(
               'Select all that apply.',
               style: TextStyle(
-                color: Color(0xFF667570),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -327,11 +323,11 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
 
             const SizedBox(height: 24),
 
-            const Row(
+            Row(
               children: [
                 Icon(
                   Icons.favorite_border,
-                  color: teal,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 26,
                 ),
                 SizedBox(width: 10),
@@ -339,7 +335,7 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
                   child: Text(
                     'WOULD YOU LIKE TO SPEND MORE TIME HERE?',
                     style: TextStyle(
-                      color: navy,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       height: 1.3,

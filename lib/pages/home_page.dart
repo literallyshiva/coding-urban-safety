@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../state/assessment_state.dart';
 import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
+import '../widgets/animated_research_emoji.dart';
 import 'study_area_page.dart';
 import 'safety_assessment_page.dart';
 import 'research_dashboard_page.dart';
@@ -200,7 +201,7 @@ class _ExploreResearchCard extends StatefulWidget {
 
 class _ExploreResearchCardState extends State<_ExploreResearchCard> {
   int selected = 0;
-  static const emojis = ['🛡️', '🚶', '✨'];
+  static const emojis = ['🛡️', '🚶🏽', '✨'];
   static const headings = ['Safety', 'Movement', 'Your voice'];
   static const descriptions = [
     'Notice how comfortable, welcoming and safe each place feels.',
@@ -256,16 +257,24 @@ class _ExploreResearchCardState extends State<_ExploreResearchCard> {
                   padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 3),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: selected == i ? c.primaryContainer : c.surfaceContainerHighest),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: selected == i
+                        ? [c.primaryContainer, c.tertiaryContainer.withValues(alpha: 0.85)]
+                        : [c.surfaceContainerHighest, c.secondaryContainer.withValues(alpha: 0.55)],
+                    ),
+                    border: Border.all(
+                      color: selected == i ? c.primary : c.outlineVariant,
+                      width: selected == i ? 1.6 : 0.8),
+                    boxShadow: selected == i ? [
+                      BoxShadow(color: c.primary.withValues(alpha: 0.14),
+                        blurRadius: 13, offset: const Offset(0, 5))
+                    ] : []),
                   child: Column(children: [
-                    TweenAnimationBuilder<double>(
-                      key: ValueKey('emoji-$i-${selected == i}'),
-                      tween: Tween(begin: selected == i ? 0.75 : 1.0, end: 1.0),
-                      duration: const Duration(milliseconds: 480),
-                      curve: Curves.elasticOut,
-                      builder: (context, scale, child) =>
-                        Transform.scale(scale: scale, child: child),
-                      child: Text(emojis[i], style: const TextStyle(fontSize: 31)),
+                    AnimatedResearchEmoji(
+                      emoji: emojis[i], size: 35,
+                      delay: i * 0.21,
                     ),
                     const SizedBox(height: 6),
                     Text(headings[i], textAlign: TextAlign.center,

@@ -1,4 +1,5 @@
 import '../widgets/research_progress.dart';
+import '../widgets/editorial_city_artwork.dart';
 
 import 'package:flutter/material.dart';
 
@@ -136,16 +137,20 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
+              const EditorialCityArtwork(safety: true),
+              const SizedBox(height: 26),
 
               Text(
-                'HOW SAFE DO YOU FEEL HERE?',
+                'How safe do you\nfeel here?',
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium
                     ?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
+                      fontSize: 34,
+                      height: 1.12,
                     ),
               ),
 
@@ -226,11 +231,11 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 ),
               ],
 
-              const SizedBox(height: 36),
-
-              Divider(color: Theme.of(context).colorScheme.outlineVariant),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: 34),
+              Container(height: 5, width: 62,
+                decoration: BoxDecoration(color: const Color(0xFFFF775F),
+                  borderRadius: BorderRadius.circular(8))),
+              const SizedBox(height: 26),
 
               Row(
                 children: [

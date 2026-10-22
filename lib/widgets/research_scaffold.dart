@@ -10,6 +10,7 @@ class ResearchScaffold extends StatelessWidget {
     this.showFieldNote = true,
     this.illustration,
     this.sectionLabel,
+    this.immersiveSafety = false,
   });
 
   final Widget child;
@@ -18,6 +19,7 @@ class ResearchScaffold extends StatelessWidget {
   final bool showFieldNote;
   final String? illustration;
   final String? sectionLabel;
+  final bool immersiveSafety;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,13 @@ class ResearchScaffold extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(builder: (context, bounds) {
           final desktop = hasArt && bounds.maxWidth >= 1000;
+          if (immersiveSafety && hasArt) {
+            return _ImmersiveSafetyLayout(
+              illustration: illustration!,
+              child: child,
+              bottomButton: bottomButton,
+            );
+          }
           if (!hasArt) {
             return Column(children: [
               Expanded(child: SingleChildScrollView(
@@ -104,6 +113,96 @@ class ResearchScaffold extends StatelessWidget {
           ]);
         }),
       ),
+    );
+  }
+}
+
+
+/// Artwork is a real full-bleed background, not a banner or a split pane.
+/// The form has its own scroll area; the action bar stays accessible.
+class _ImmersiveSafetyLayout extends StatelessWidget {
+  const _ImmersiveSafetyLayout({required this.illustration,
+    required this.child, this.bottomButton});
+  final String illustration;
+  final Widget child;
+  final Widget? bottomButton;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, size) {
+    final desktop = size.maxWidth >= 900;
+    final colors = Theme.of(context).colorScheme;
+    return Stack(children: [
+      Positioned.fill(child: Image.asset(illustration,
+        fit: BoxFit.cover, alignment: Alignment.center)),
+      Positioned.fill(child: ColoredBox(color: Colors.black.withValues(alpha: .06))),
+      if (desktop)
+        Align(alignment: Alignment.centerRight, child: FractionallySizedBox(
+          widthFactor: size.maxWidth > 1450 ? .48 : .56,
+          heightFactor: 1,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 20, 26, 20),
+            child: _SafetySurface(child: child, bottomButton: bottomButton),
+          ),
+        ))
+      else
+        Column(children: [
+          SizedBox(height: size.maxHeight < 680 ? 150 : 210,
+            child: Align(alignment: Alignment.topLeft, child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: colors.surface.withValues(alpha: .92),
+                  borderRadius: BorderRadius.circular(30)),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+                  child: Text('01 / 05   •   SAFETY', style: TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
+                ),
+              ),
+            )),
+          ),
+          Expanded(child: _SafetySurface(child: child, bottomButton: bottomButton)),
+        ]),
+    ]);
+  });
+}
+
+class _SafetySurface extends StatelessWidget {
+  const _SafetySurface({required this.child, this.bottomButton});
+  final Widget child;
+  final Widget? bottomButton;
+  @override
+  Widget build(BuildContext context) {
+    const teal = Color(0xFF007D78);
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFCF7),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [BoxShadow(color: Color(0x330B2C35),
+          blurRadius: 35, offset: Offset(0, 12))],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: [
+        Expanded(child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 18),
+          child: Theme(data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: teal, surface: const Color(0xFFFFFCF7),
+              onSurface: const Color(0xFF0E3041),
+              onSurfaceVariant: const Color(0xFF54646B),
+              outlineVariant: const Color(0xFFE2E8E5),
+              primaryContainer: const Color(0xFFDEF4ED),
+              onPrimaryContainer: const Color(0xFF07544F),
+            )), child: child),
+        )),
+        if (bottomButton != null) Container(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 18),
+          decoration: const BoxDecoration(color: Color(0xFFFFFCF7),
+            border: Border(top: BorderSide(color: Color(0xFFE2E8E5)))),
+          child: Theme(data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(primary: teal)),
+            child: bottomButton!),
+        ),
+      ]),
     );
   }
 }

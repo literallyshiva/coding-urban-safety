@@ -88,7 +88,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
     final state = widget.assessmentState;
 
     return ResearchScaffold(
-      illustration: 'assets/images/illustrated/06_safety.png',
+      illustration: 'assets/images/illustrated/safety_street_desktop.webp',
       sectionLabel: 'SAFETY',
       immersiveSafety: true,
       bottomButton: PrimaryActionButton(

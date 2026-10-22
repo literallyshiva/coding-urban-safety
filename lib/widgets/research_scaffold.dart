@@ -132,8 +132,15 @@ class _ImmersiveSafetyLayout extends StatelessWidget {
     final desktop = size.maxWidth >= 900;
     final colors = Theme.of(context).colorScheme;
     return Stack(children: [
-      Positioned.fill(child: Image.asset(illustration,
-        fit: BoxFit.cover, alignment: Alignment.center)),
+      Positioned.fill(child: Image.asset(
+        illustration.endsWith('safety_street_desktop.webp') && !desktop
+          ? 'assets/images/illustrated/safety_street_mobile.webp'
+          : illustration,
+        fit: BoxFit.cover,
+        alignment: desktop ? Alignment.centerLeft : Alignment.topCenter,
+        filterQuality: FilterQuality.high,
+        gaplessPlayback: true,
+      )),
       Positioned.fill(child: ColoredBox(color: Colors.black.withValues(alpha: .06))),
       if (desktop)
         Align(alignment: Alignment.centerRight, child: FractionallySizedBox(

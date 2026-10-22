@@ -23,7 +23,7 @@ class SafetyAssessmentPage extends StatefulWidget {
 
 class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
   static const navy = Color(0xFF202A30);
-  static const teal = Color(0xFF647C77);
+  static const teal = Color(0xFF007D78);
 
   static const unsafeOptions = [
     'Poor lighting',
@@ -117,7 +117,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 child: const LinearProgressIndicator(value: .2, minHeight: 7,
                   backgroundColor: Color(0xFFE5E9E6),
                   valueColor: AlwaysStoppedAnimation(Color(0xFF007D78)))),
-              const SizedBox(height: 26),
+              const SizedBox(height: 19),
               const Text('How safe do you\nfeel here?',
                 style: TextStyle(color: Color(0xFF103247),
                   fontSize: 32, height: 1.12, fontWeight: FontWeight.w900)),
@@ -137,7 +137,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                   style: const TextStyle(color: Color(0xFF007D78),
                     fontSize: 13, fontWeight: FontWeight.w700)),
               ],
-              const SizedBox(height: 28),
+              const SizedBox(height: 22),
               Row(children: [
                 const Icon(Icons.visibility_outlined, color: Color(0xFF007D78), size: 24),
                 const SizedBox(width: 10),
@@ -180,22 +180,40 @@ class _SafetyRatingTile extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  static const faces = ['😟', '🙁', '😐', '🙂', '😄'];
+  static const faceIcons = [
+    Icons.sentiment_very_dissatisfied_rounded,
+    Icons.sentiment_dissatisfied_rounded,
+    Icons.sentiment_neutral_rounded,
+    Icons.sentiment_satisfied_rounded,
+    Icons.sentiment_very_satisfied_rounded,
+  ];
+  static const faceColors = [
+    Color(0xFFFF626C), Color(0xFFFF974F), Color(0xFFFFCC4E),
+    Color(0xFF19C8BA), Color(0xFF007F7A),
+  ];
   @override
   Widget build(BuildContext context) => Padding(padding: const EdgeInsets.symmetric(horizontal: 3),
       child: Semantics(button: true, selected: selected,
         label: '$rating: $label', child: InkWell(
           onTap: onTap, borderRadius: BorderRadius.circular(16),
           child: AnimatedContainer(duration: const Duration(milliseconds: 180),
-            constraints: const BoxConstraints(minHeight: 115),
+            constraints: const BoxConstraints(minHeight: 126),
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 12),
             decoration: BoxDecoration(
-              color: selected ? const Color(0xFFE4F7F1) : const Color(0xFFFFF6EF),
+              color: selected ? const Color(0xFFDDF7F1) : const Color(0xFFFFFBF7),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: selected ? const Color(0xFF007D78)
-                : const Color(0xFFE5DDD6), width: selected ? 2 : 1)),
+                : const Color(0xFFE5DDD6), width: selected ? 2 : 1),
+              boxShadow: selected ? [const BoxShadow(
+                color: Color(0x26007D78), blurRadius: 12, offset: Offset(0, 5))] : null),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(faces[rating-1], style: const TextStyle(fontSize: 25)),
+              Container(
+                width: 43, height: 43,
+                decoration: BoxDecoration(
+                  color: faceColors[rating - 1], shape: BoxShape.circle),
+                child: Icon(faceIcons[rating - 1], size: 30,
+                  color: rating == 5 ? Colors.white : const Color(0xFF163646)),
+              ),
               const SizedBox(height: 5),
               Text('$rating', style: const TextStyle(fontSize: 15,
                 color: Color(0xFF12374A), fontWeight: FontWeight.w800)),
@@ -221,12 +239,20 @@ class _SafetyConditionTile extends StatelessWidget {
     button: true, selected: selected, label: label,
     child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(14),
       child: AnimatedContainer(duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFE4F7F1) : const Color(0xFFF7F8F6),
-          borderRadius: BorderRadius.circular(14)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: selected ? const Color(0xFF80CFC0)
+            : const Color(0xFFE6E9E7))),
         child: Row(children: [
-          Text(emoji, style: const TextStyle(fontSize: 19)),
+          Container(
+            width: 34, height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFFBDEBE1) : const Color(0xFFFFEEDB),
+              borderRadius: BorderRadius.circular(11)),
+            child: Text(emoji, style: const TextStyle(fontSize: 19))),
           const SizedBox(width: 9),
           Expanded(child: Text(label, style: const TextStyle(
             color: Color(0xFF12374A), fontSize: 12, fontWeight: FontWeight.w600))),

@@ -137,10 +137,10 @@ class _ImmersiveSafetyLayout extends StatelessWidget {
       Positioned.fill(child: ColoredBox(color: Colors.black.withValues(alpha: .06))),
       if (desktop)
         Align(alignment: Alignment.centerRight, child: FractionallySizedBox(
-          widthFactor: size.maxWidth > 1450 ? .48 : .56,
+          widthFactor: size.maxWidth > 1450 ? .45 : .53,
           heightFactor: 1,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 20, 26, 20),
+            padding: const EdgeInsets.fromLTRB(0, 24, 30, 24),
             child: _SafetySurface(child: child, bottomButton: bottomButton),
           ),
         ))
@@ -183,7 +183,7 @@ class _SafetySurface extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
         Expanded(child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 18),
+          padding: const EdgeInsets.fromLTRB(26, 22, 26, 16),
           child: Theme(data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: teal, surface: const Color(0xFFFFFCF7),

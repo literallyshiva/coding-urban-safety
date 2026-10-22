@@ -44,7 +44,7 @@ class SpatialAssessmentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResearchScaffold(
-      illustration: 'assets/images/illustrated/08_spatial.png',
+      illustration: 'assets/images/illustrated/08_spatial.webp',
       sectionLabel: 'SPATIAL CONDITIONS',
       bottomButton: PrimaryActionButton(
         label: 'NEXT',

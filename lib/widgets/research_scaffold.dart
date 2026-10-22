@@ -35,9 +35,9 @@ class ResearchScaffold extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(builder: (context, bounds) {
           final desktop = hasArt && bounds.maxWidth >= 1000;
-          if (immersiveSafety && hasArt) {
+          if (hasArt) {
             return _ImmersiveSafetyLayout(
-              illustration: illustration!,
+              illustration: illustration!, sectionLabel: sectionLabel,
               child: child,
               bottomButton: bottomButton,
             );
@@ -118,12 +118,23 @@ class ResearchScaffold extends StatelessWidget {
 }
 
 
+String _responsiveIllustration(String desktopAsset, bool desktop) {
+  if (desktop) return desktopAsset;
+  // Use a dedicated mobile asset only when it is supplied by the project.
+  // Do not assume the older converted PNGs have mobile counterparts.
+  if (desktopAsset.endsWith('/safety_street_desktop.webp')) {
+    return 'assets/images/illustrated/safety_street_mobile.webp';
+  }
+  return desktopAsset;
+}
+
 /// Artwork is a real full-bleed background, not a banner or a split pane.
 /// The form has its own scroll area; the action bar stays accessible.
 class _ImmersiveSafetyLayout extends StatelessWidget {
   const _ImmersiveSafetyLayout({required this.illustration,
-    required this.child, this.bottomButton});
+    required this.child, this.bottomButton, this.sectionLabel});
   final String illustration;
+  final String? sectionLabel;
   final Widget child;
   final Widget? bottomButton;
 
@@ -133,9 +144,7 @@ class _ImmersiveSafetyLayout extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Stack(children: [
       Positioned.fill(child: Image.asset(
-        illustration.endsWith('safety_street_desktop.webp') && !desktop
-            ? 'assets/images/illustrated/safety_street_mobile.webp'
-            : illustration,
+        _responsiveIllustration(illustration, desktop),
         fit: BoxFit.cover,
         alignment: desktop ? Alignment.centerLeft : Alignment.topCenter,
         filterQuality: FilterQuality.high,
@@ -159,9 +168,9 @@ class _ImmersiveSafetyLayout extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(color: colors.surface.withValues(alpha: .92),
                   borderRadius: BorderRadius.circular(30)),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 9),
-                  child: Text('01 / 05   •   SAFETY', style: TextStyle(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+                  child: Text((sectionLabel ?? 'URBAN SAFETY').toUpperCase(), style: const TextStyle(
                     fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
                 ),
               ),

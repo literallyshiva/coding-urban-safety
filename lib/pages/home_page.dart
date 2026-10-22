@@ -40,7 +40,7 @@ class HomePage extends StatelessWidget {
     final textColor = colors.onSurface;
     final secondary = colors.onSurfaceVariant;
     return ResearchScaffold(
-      illustration: 'assets/images/illustrated/01_welcome.png',
+      illustration: 'assets/images/illustrated/01_welcome.webp',
       sectionLabel: 'WELCOME',
       showFieldNote: false,
       child: Padding(

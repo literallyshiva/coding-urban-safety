@@ -134,8 +134,8 @@ class _ImmersiveSafetyLayout extends StatelessWidget {
     return Stack(children: [
       Positioned.fill(child: Image.asset(
         illustration.endsWith('safety_street_desktop.webp') && !desktop
-          ? 'assets/images/illustrated/safety_street_mobile.webp'
-          : illustration,
+            ? 'assets/images/illustrated/safety_street_mobile.webp'
+            : illustration,
         fit: BoxFit.cover,
         alignment: desktop ? Alignment.centerLeft : Alignment.topCenter,
         filterQuality: FilterQuality.high,

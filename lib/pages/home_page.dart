@@ -40,6 +40,8 @@ class HomePage extends StatelessWidget {
     final textColor = colors.onSurface;
     final secondary = colors.onSurfaceVariant;
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/01_welcome.png',
+      sectionLabel: 'WELCOME',
       showFieldNote: false,
       child: Padding(
         padding: const EdgeInsets.only(top: 8, bottom: 24),
@@ -64,12 +66,12 @@ class HomePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 25),
-            Text('WELCOME  /  YOUR CITY, YOUR STORY',
+            Text('PEOPLE  /  PLACES  /  SAFER CITIES',
               style: TextStyle(fontSize: 11, letterSpacing: 2,
                 fontWeight: FontWeight.w700, color: colors.primary)),
             const SizedBox(height: 13),
-            Text(AppPreferences.instance.tr('How do we\nexperience\nour cities?', 'നമ്മുടെ നഗരങ്ങളെ\nനാം എങ്ങനെ\nഅനുഭവിക്കുന്നു?'),
-              style: TextStyle(fontSize: 46, height: 1.08,
+            Text('CODING\nURBAN SAFETY',
+              style: TextStyle(fontSize: 43, height: 1.04,
                 fontWeight: FontWeight.w600, letterSpacing: -0.7, color: textColor)),
             const SizedBox(height: 20),
             Container(height: 2, width: 65, color: Theme.of(context).colorScheme.primary),
@@ -77,7 +79,7 @@ class HomePage extends StatelessWidget {
             Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
               style: TextStyle(fontSize: 17, height: 1.55, color: textColor)),
             const SizedBox(height: 27),
-            const EditorialCityArtwork(),
+            // Illustrated scene is now the page hero, not an embedded picture.
             const SizedBox(height: 14),
             const _EditorialNote(),
             const SizedBox(height: 22),

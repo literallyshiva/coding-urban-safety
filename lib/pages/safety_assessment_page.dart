@@ -88,6 +88,8 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
     final state = widget.assessmentState;
 
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/06_safety.png',
+      sectionLabel: 'SAFETY',
       bottomButton: PrimaryActionButton(
         label: 'NEXT',
         onPressed: _next,
@@ -138,7 +140,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
               ),
 
               const SizedBox(height: 24),
-              const EditorialCityArtwork(safety: true),
+              // Safety illustration is integrated into the page header.
               const SizedBox(height: 26),
 
               Text(

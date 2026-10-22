@@ -8,59 +8,123 @@ class ResearchScaffold extends StatelessWidget {
     this.bottomButton,
     this.appBarTitle = 'CODING URBAN SAFETY',
     this.showFieldNote = true,
+    this.illustration,
+    this.sectionLabel,
   });
 
   final Widget child;
   final Widget? bottomButton;
   final String appBarTitle;
   final bool showFieldNote;
+  final String? illustration;
+  final String? sectionLabel;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final illustrated = illustration != null;
     return Scaffold(
-      appBar: AppBar(title: Text(appBarTitle), actions: const [AppSettingsButton()]),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 44),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 780),
-                    child: showFieldNote ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _FieldworkBanner(),
-                        const SizedBox(height: 22),
-                        child,
-                      ],
-                    ) : child,
-                  ),
-                ),
-              ),
-            ),
-            if (bottomButton != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: .09),
-                      blurRadius: 22, offset: const Offset(0, -5),
-                    ),
-                  ],
-                  border: Border(
-                    top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-                  ),
-                ),
-                child: SafeArea(top: false, child: bottomButton!),
-              ),
-          ],
-        ),
+      appBar: AppBar(
+        backgroundColor: colors.surface,
+        title: Text(appBarTitle, style: const TextStyle(
+          fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: .8)),
+        actions: const [AppSettingsButton()],
       ),
+      body: SafeArea(child: Column(children: [
+        Expanded(child: SingleChildScrollView(
+          child: Column(children: [
+            if (illustrated)
+              _IllustratedBanner(asset: illustration!, section: sectionLabel),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, illustrated ? 0 : 24, 16, 32),
+              child: Center(child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: illustrated
+                  ? Transform.translate(
+                      offset: const Offset(0, -26),
+                      child: _EditorialPaper(child: child),
+                    )
+                  : child,
+              )),
+            ),
+          ]),
+        )),
+        if (bottomButton != null)
+          Container(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              border: Border(top: BorderSide(color: colors.outlineVariant)),
+              boxShadow: [BoxShadow(
+                color: colors.shadow.withValues(alpha: .08),
+                blurRadius: 18, offset: const Offset(0, -5))],
+            ),
+            child: SafeArea(top: false, child: bottomButton!),
+          ),
+      ])),
+    );
+  }
+}
+
+class _IllustratedBanner extends StatelessWidget {
+  const _IllustratedBanner({required this.asset, this.section});
+  final String asset;
+  final String? section;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final height = screenWidth < 600 ? 310.0 : 360.0;
+    return Semantics(
+      label: 'Illustrated urban public space',
+      image: true,
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: Stack(fit: StackFit.expand, children: [
+          Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center),
+          DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.transparent, colors.surface.withValues(alpha: .06),
+              colors.surface.withValues(alpha: .82)],
+            stops: const [0, .68, 1],
+          ))),
+          if (section != null)
+            Positioned(left: 20, top: 20, child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(color: colors.surface.withValues(alpha: .95),
+                borderRadius: BorderRadius.circular(30)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.location_on_outlined, color: colors.primary, size: 17),
+                const SizedBox(width: 6),
+                Text(section!, style: TextStyle(fontSize: 11, letterSpacing: 1,
+                  fontWeight: FontWeight.w900, color: colors.onSurface)),
+              ]),
+            )),
+        ]),
+      ),
+    );
+  }
+}
+
+class _EditorialPaper extends StatelessWidget {
+  const _EditorialPaper({required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 25, 20, 27),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: .65)),
+        boxShadow: [BoxShadow(color: colors.shadow.withValues(alpha: .1),
+          blurRadius: 25, offset: const Offset(0, 10))],
+      ),
+      child: child,
     );
   }
 }
@@ -86,7 +150,7 @@ class PrimaryActionButton extends StatelessWidget {
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(19),
           ),
           textStyle: const TextStyle(
             fontSize: 15,
@@ -196,42 +260,4 @@ class AppSettingsButton extends StatelessWidget {
       ],
     ),
   );
-}
-
-
-/// Distinctive, reusable header for the Urban Safety 2.0 fieldwork journey.
-class _FieldworkBanner extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final c = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(colors: [
-          c.primaryContainer.withValues(alpha: .85),
-          c.tertiaryContainer.withValues(alpha: .55),
-        ]),
-        border: Border.all(color: c.outlineVariant),
-      ),
-      child: Row(children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(13)),
-          child: Icon(Icons.travel_explore_rounded, color: c.onPrimary, size: 22),
-        ),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('URBAN SAFETY  /  FIELDWORK 2.0',
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11,
-              letterSpacing: 1.0, color: c.onPrimaryContainer)),
-          const SizedBox(height: 3),
-          Text('Observe. Reflect. Reimagine.',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13,
-              color: c.onPrimaryContainer)),
-        ])),
-        Icon(Icons.auto_awesome_rounded, color: c.onPrimaryContainer, size: 22),
-      ]),
-    );
-  }
 }

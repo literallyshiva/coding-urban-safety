@@ -31,7 +31,7 @@ class AnimatedResearchChoice extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(21),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 260),
           curve: Curves.easeOutCubic,
@@ -45,7 +45,7 @@ class AnimatedResearchChoice extends StatelessWidget {
                 ? [c.primaryContainer, c.tertiaryContainer.withValues(alpha: .75)]
                 : [c.surfaceContainerLow, c.secondaryContainer.withValues(alpha: .55)],
             ),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(21),
             border: Border.all(
               color: selected ? c.primary : c.outlineVariant,
               width: selected ? 2 : 1,

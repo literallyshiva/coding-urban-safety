@@ -69,6 +69,8 @@ class LudicPotentialPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/09_ludic.png',
+      sectionLabel: 'LUDIC QUALITIES',
       bottomButton: PrimaryActionButton(label: 'NEXT', onPressed: () => _next(context)),
       child: AnimatedBuilder(
         animation: assessmentState,

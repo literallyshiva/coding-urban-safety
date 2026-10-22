@@ -191,6 +191,8 @@ class _LudicAssessmentPageState extends State<LudicAssessmentPage> {
     final state = widget.assessmentState;
 
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/07_experience.png',
+      sectionLabel: 'EXPERIENCE',
       bottomButton: PrimaryActionButton(
         label: 'NEXT',
         onPressed: _next,

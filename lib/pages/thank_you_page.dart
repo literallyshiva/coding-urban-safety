@@ -31,6 +31,8 @@ class ThankYouPage extends StatelessWidget {
     const coral = Color(0xFFD2A27B);
 
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/05_thank_you.png',
+      sectionLabel: 'THANK YOU',
       appBarTitle: 'THANK YOU',
       bottomButton: PrimaryActionButton(
         label: 'ASSESS ANOTHER PLACE',

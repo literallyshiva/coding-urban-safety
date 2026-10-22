@@ -25,3 +25,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/urban_waterfront_sketch.png
+    - assets/images/illustrated/

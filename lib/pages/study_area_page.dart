@@ -17,6 +17,8 @@ class StudyAreaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResearchScaffold(
+      illustration: 'assets/images/illustrated/02_study_area.png',
+      sectionLabel: 'STUDY AREA',
       bottomButton: PrimaryActionButton(
         label: AppPreferences.instance.tr('START WALK', 'നടത്തം ആരംഭിക്കുക'),
         onPressed: () {

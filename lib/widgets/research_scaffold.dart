@@ -8,12 +8,14 @@ class ResearchScaffold extends StatelessWidget {
     this.bottomButton,
     this.appBarTitle = 'CODING URBAN SAFETY',
     this.showFieldNote = true,
+    this.v2Mode = false,
   });
 
   final Widget child;
   final Widget? bottomButton;
   final String appBarTitle;
   final bool showFieldNote;
+  final bool v2Mode;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +26,13 @@ class ResearchScaffold extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
+                padding: EdgeInsets.fromLTRB(
+                  v2Mode ? 16 : 20, v2Mode ? 18 : 28,
+                  v2Mode ? 16 : 20, 36),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 720),
-                    child: showFieldNote ? Column(
+                    constraints: BoxConstraints(maxWidth: v2Mode ? 800 : 720),
+                    child: (showFieldNote && !v2Mode) ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(width: 44, height: 2,

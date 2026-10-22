@@ -1,4 +1,5 @@
 import '../widgets/research_progress.dart';
+import '../widgets/v2_question_card.dart';
 
 import 'package:flutter/material.dart';
 
@@ -87,6 +88,7 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
     final state = widget.assessmentState;
 
     return ResearchScaffold(
+      v2Mode: true,
       bottomButton: PrimaryActionButton(
         label: 'NEXT',
         onPressed: _next,
@@ -101,98 +103,23 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
             children: [
               const ResearchProgress(stage: 0),
               const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '01 / SAFETY',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  Text(
-                    'Your perspective matters',
-                    style: TextStyle(
+              V2QuestionCard(
+                number: '01',
+                icon: Icons.shield_outlined,
+                title: 'How safe do you feel here?',
+                description: 'Think about your experience at this location. Choose one answer.',
+                child: Column(children: [
+                  Row(children: [for (int i = 1; i <= 5; i++)
+                    _ratingOption(state, i)]),
+                  const SizedBox(height: 12),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [Text('Very unsafe', style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: LinearProgressIndicator(
-                  value: 0.2,
-                  minHeight: 6,
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              Text(
-                'HOW SAFE DO YOU FEEL HERE?',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                    ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                'Choose the feeling that best describes '
-                'this place.',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 15,
-                  height: 1.5,
-                ),
-              ),
-
-              const SizedBox(height: 26),
-
-              Row(
-                children: [
-                  for (int i = 1; i <= 5; i++)
-                    _ratingOption(state, i),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Very Unsafe',
-                    style: TextStyle(
+                      fontSize: 12)), Text('Very safe', style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    'Very Safe',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+                      fontSize: 12))]),
+                ]),
               ),
-
               if (rating != null) ...[
                 const SizedBox(height: 22),
                 Container(
@@ -226,46 +153,14 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 ),
               ],
 
-              const SizedBox(height: 36),
-
-              Divider(color: Theme.of(context).colorScheme.outlineVariant),
-
-              const SizedBox(height: 24),
-
-              Row(
-                children: [
-                  Icon(
-                    Icons.visibility_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 26,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'WHAT MAKES THIS PLACE FEEL UNSAFE?',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              Text(
-                'Select all that apply, or leave blank.',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
+              const SizedBox(height: 18),
+              V2QuestionCard(
+                number: '02',
+                icon: Icons.visibility_outlined,
+                title: 'Which conditions affect safety here?',
+                description: 'Select any conditions you observed. This question is optional for every safety rating.',
+                optional: true,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('\u2713 ${state.unsafeConditions.length} of ${unsafeOptions.length} selected', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
             LayoutBuilder(builder: (context, constraints) {
@@ -290,6 +185,9 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
                 );
               }),
 
+              const SizedBox(height: 8),
+                ]),
+              ),
               const SizedBox(height: 30),
             ],
           );

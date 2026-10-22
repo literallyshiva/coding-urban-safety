@@ -8,14 +8,12 @@ class ResearchScaffold extends StatelessWidget {
     this.bottomButton,
     this.appBarTitle = 'CODING URBAN SAFETY',
     this.showFieldNote = true,
-    this.v2Mode = false,
   });
 
   final Widget child;
   final Widget? bottomButton;
   final String appBarTitle;
   final bool showFieldNote;
-  final bool v2Mode;
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +24,15 @@ class ResearchScaffold extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  v2Mode ? 16 : 20, v2Mode ? 18 : 28,
-                  v2Mode ? 16 : 20, 36),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 44),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: v2Mode ? 800 : 720),
-                    child: (showFieldNote && !v2Mode) ? Column(
+                    constraints: const BoxConstraints(maxWidth: 780),
+                    child: showFieldNote ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(width: 44, height: 2,
-                          color: Theme.of(context).colorScheme.primary),
-                        const SizedBox(height: 20),
+                        _FieldworkBanner(),
+                        const SizedBox(height: 22),
                         child,
                       ],
                     ) : child,
@@ -48,9 +43,15 @@ class ResearchScaffold extends StatelessWidget {
             if (bottomButton != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: .09),
+                      blurRadius: 22, offset: const Offset(0, -5),
+                    ),
+                  ],
                   border: Border(
                     top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                   ),
@@ -85,7 +86,7 @@ class PrimaryActionButton extends StatelessWidget {
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(18),
           ),
           textStyle: const TextStyle(
             fontSize: 15,
@@ -195,4 +196,42 @@ class AppSettingsButton extends StatelessWidget {
       ],
     ),
   );
+}
+
+
+/// Distinctive, reusable header for the Urban Safety 2.0 fieldwork journey.
+class _FieldworkBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final c = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(colors: [
+          c.primaryContainer.withValues(alpha: .85),
+          c.tertiaryContainer.withValues(alpha: .55),
+        ]),
+        border: Border.all(color: c.outlineVariant),
+      ),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(13)),
+          child: Icon(Icons.travel_explore_rounded, color: c.onPrimary, size: 22),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('URBAN SAFETY  /  FIELDWORK 2.0',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11,
+              letterSpacing: 1.0, color: c.onPrimaryContainer)),
+          const SizedBox(height: 3),
+          Text('Observe. Reflect. Reimagine.',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13,
+              color: c.onPrimaryContainer)),
+        ])),
+        Icon(Icons.auto_awesome_rounded, color: c.onPrimaryContainer, size: 22),
+      ]),
+    );
+  }
 }

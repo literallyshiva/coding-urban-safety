@@ -1,4 +1,5 @@
 import '../widgets/research_progress.dart';
+import '../widgets/editorial_city_artwork.dart';
 
 import 'package:flutter/material.dart';
 
@@ -101,110 +102,200 @@ class _SafetyAssessmentPageState extends State<SafetyAssessmentPage> {
             children: [
               const ResearchProgress(stage: 0),
               const SizedBox(height: 18),
-              Row(children: [
-                Icon(Icons.shield_outlined,
-                  color: Theme.of(context).colorScheme.primary, size: 22),
-                const SizedBox(width: 10),
-                Text('01 / SAFETY',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-                const Spacer(),
-                Text('YOUR PERSPECTIVE',
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 10, fontWeight: FontWeight.w700)),
-              ]),
-              const SizedBox(height: 22),
-              Text('How safe do you\\nfeel here?',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 35, height: 1.12, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 10),
-              Text('Think about your experience at this location. There are no right or wrong answers.',
-                style: TextStyle(fontSize: 15, height: 1.5,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
-              const SizedBox(height: 22),
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 22, 16, 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-                ),
-                child: Column(children: [
-                  Row(children: [
-                    for (int i = 1; i <= 5; i++) _ratingOption(state, i),
-                  ]),
-                  const SizedBox(height: 14),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('VERY UNSAFE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                    Text('VERY SAFE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                  ]),
-                  if (rating != null) ...[
-                    const SizedBox(height: 18),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16)),
-                      child: Column(children: [
-                        Text(ratingLabels[rating - 1],
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 19,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                        const SizedBox(height: 3),
-                        Text('Your safety perception',
-                          style: TextStyle(fontSize: 12,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                      ]),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '01 / SAFETY',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
                     ),
-                  ],
-                ]),
+                  ),
+                  Text(
+                    'Your perspective matters',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 28),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+
+              const SizedBox(height: 14),
+
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: 0.2,
+                  minHeight: 6,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                 ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Icon(Icons.visibility_outlined, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text('What conditions affect safety here?',
-                      style: TextStyle(fontSize: 19, height: 1.25,
+              ),
+
+              const SizedBox(height: 24),
+              const EditorialCityArtwork(safety: true),
+              const SizedBox(height: 26),
+
+              Text(
+                'How safe do you\nfeel here?',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 34,
+                      height: 1.12,
+                    ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                'Choose the feeling that best describes '
+                'this place.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 26),
+
+              Row(
+                children: [
+                  for (int i = 1; i <= 5; i++)
+                    _ratingOption(state, i),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Very Unsafe',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    'Very Safe',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+
+              if (rating != null) ...[
+                const SizedBox(height: 22),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius:
+                        BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        ratingLabels[rating - 1],
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Your selected safety rating',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 34),
+              Container(height: 5, width: 62,
+                decoration: BoxDecoration(color: const Color(0xFFFF775F),
+                  borderRadius: BorderRadius.circular(8))),
+              const SizedBox(height: 26),
+
+              Row(
+                children: [
+                  Icon(
+                    Icons.visibility_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 26,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'WHAT MAKES THIS PLACE FEEL UNSAFE?',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Theme.of(context).colorScheme.onSurface))),
-                  ]),
-                  const SizedBox(height: 8),
-                  Text('Select any that you noticed. This question is optional.',
-                    style: TextStyle(fontSize: 13,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                  const SizedBox(height: 16),
-                  Text('${state.unsafeConditions.length} SELECTED',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
-                      color: Theme.of(context).colorScheme.primary)),
-                  const SizedBox(height: 12),
-                  LayoutBuilder(builder: (context, constraints) {
-                    final columns = constraints.maxWidth < 390 ? 1 : 2;
-                    final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
-                    return Wrap(spacing: 12, runSpacing: 12, children: [
-                      for (var i = 0; i < unsafeOptions.length; i++)
-                        SizedBox(width: width, child: AnimatedResearchChoice(
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                'Select all that apply, or leave blank.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Text('\u2713 ${state.unsafeConditions.length} of ${unsafeOptions.length} selected', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
+            LayoutBuilder(builder: (context, constraints) {
+                final columns = constraints.maxWidth < 340 ? 1 : 2;
+                final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (var i = 0; i < unsafeOptions.length; i++)
+                      SizedBox(
+                        width: width,
+                        child: AnimatedResearchChoice(
                           label: unsafeOptions[i],
                           emoji: unsafeEmojis[i],
-                          delay: i * .09,
+                          delay: i * .13,
                           selected: state.unsafeConditions.contains(unsafeOptions[i]),
                           onTap: () => state.toggleUnsafeCondition(unsafeOptions[i]),
-                        )),
-                    ]);
-                  }),
-                ]),
-              ),
-              const SizedBox(height: 24),
+                        ),
+                      ),
+                  ],
+                );
+              }),
+
+              const SizedBox(height: 30),
             ],
           );
         },

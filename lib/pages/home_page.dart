@@ -4,6 +4,7 @@ import '../state/assessment_state.dart';
 import '../services/app_preferences.dart';
 import '../widgets/research_scaffold.dart';
 import '../widgets/animated_research_emoji.dart';
+import '../widgets/editorial_city_artwork.dart';
 import 'study_area_page.dart';
 import 'safety_assessment_page.dart';
 import 'research_dashboard_page.dart';
@@ -63,12 +64,12 @@ class HomePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 25),
-            Text('01  /  INTRODUCTION',
+            Text('WELCOME  /  YOUR CITY, YOUR STORY',
               style: TextStyle(fontSize: 11, letterSpacing: 2,
                 fontWeight: FontWeight.w700, color: colors.primary)),
             const SizedBox(height: 13),
             Text(AppPreferences.instance.tr('How do we\nexperience\nour cities?', 'നമ്മുടെ നഗരങ്ങളെ\nനാം എങ്ങനെ\nഅനുഭവിക്കുന്നു?'),
-              style: TextStyle(fontSize: 43, height: 1.16,
+              style: TextStyle(fontSize: 46, height: 1.08,
                 fontWeight: FontWeight.w600, letterSpacing: -0.7, color: textColor)),
             const SizedBox(height: 20),
             Container(height: 2, width: 65, color: Theme.of(context).colorScheme.primary),
@@ -76,7 +77,9 @@ class HomePage extends StatelessWidget {
             Text(AppPreferences.instance.tr('A study of safety, movement and playful exploration in public spaces.', 'പൊതു ഇടങ്ങളിലെ സുരക്ഷ, സഞ്ചാരം, വിനോദാനുഭവങ്ങൾ എന്നിവയെക്കുറിച്ചുള്ള പഠനം.'),
               style: TextStyle(fontSize: 17, height: 1.55, color: textColor)),
             const SizedBox(height: 27),
-            const _AnimatedCityHero(),
+            const EditorialCityArtwork(),
+            const SizedBox(height: 14),
+            const _EditorialNote(),
             const SizedBox(height: 22),
             const _ExploreResearchCard(),
             const SizedBox(height: 22),
@@ -455,6 +458,27 @@ class _ExploreResearchCardState extends State<_ExploreResearchCard> {
                 ? descriptionsMl[selected] : descriptions[selected],
             key: ValueKey('${AppPreferences.instance.language}-$selected'),
             style: TextStyle(fontSize: 13, height: 1.5, color: c.onSurfaceVariant))),
+      ]),
+    );
+  }
+}
+
+class _EditorialNote extends StatelessWidget {
+  const _EditorialNote();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF26314B),
+        borderRadius: BorderRadius.circular(20)),
+      child: Row(children: [
+        const Icon(Icons.auto_awesome_rounded, color: Color(0xFFFFC84B), size: 28),
+        const SizedBox(width: 13),
+        Expanded(child: Text('A field guide to the spaces we share.',
+          style: const TextStyle(color: Colors.white, fontSize: 16,
+            height: 1.25, fontWeight: FontWeight.w800))),
+        const Icon(Icons.north_east_rounded, color: Color(0xFFFFC84B)),
       ]),
     );
   }

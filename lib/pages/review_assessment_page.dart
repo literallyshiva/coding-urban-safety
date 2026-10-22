@@ -52,7 +52,7 @@ class _ReviewAssessmentPageState extends State<ReviewAssessmentPage> {
     final state = widget.assessmentState;
     String list(List<String> values) => values.isEmpty ? 'None selected' : values.join(', ');
     return ResearchScaffold(
-      illustration: 'assets/images/illustrated/03_gender.webp',
+      illustration: 'assets/images/illustrated/gender_desktop.webp',
       sectionLabel: 'REVIEW YOUR ANSWERS',
       appBarTitle: 'REVIEW YOUR ANSWERS',
       bottomButton: PrimaryActionButton(

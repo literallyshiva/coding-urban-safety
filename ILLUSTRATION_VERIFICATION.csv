@@ -1,0 +1,21 @@
+page,variant,asset,width,height,bytes,sha256_prefix,dart_usage
+welcome,desktop,welcome_desktop.webp,1920,1080,259730,824f4180e903e1cc,yes
+welcome,mobile,welcome_mobile.webp,1080,1920,207356,e3342bf9c7f56a6c,yes
+study_area,desktop,study_area_desktop.webp,1920,1080,261448,e5be0829d763bd17,yes
+study_area,mobile,study_area_mobile.webp,1080,1920,197956,5943e8641fb1ec90,yes
+gender,desktop,gender_desktop.webp,1920,1080,252448,934efcc21b7b4807,yes
+gender,mobile,gender_mobile.webp,1080,1920,201634,e93e26310fe5c439,yes
+location,desktop,location_desktop.webp,1920,1080,252688,b25ad733411e3c8c,asset only
+location,mobile,location_mobile.webp,1080,1920,208476,95a87bb8e206bc9a,asset only
+safety,desktop,safety_desktop.webp,1920,1080,232110,60f6e5da1443427d,yes
+safety,mobile,safety_mobile.webp,1080,1920,177470,4f1bb6b7b20d8640,yes
+experience,desktop,experience_desktop.webp,1920,1080,259032,91d626df9faa2b4a,yes
+experience,mobile,experience_mobile.webp,1080,1920,202632,0c8f5fe9b85fdf66,yes
+spatial,desktop,spatial_desktop.webp,1920,1080,223860,254180d864bdef88,yes
+spatial,mobile,spatial_mobile.webp,1080,1920,195644,c666c1aa502a61cc,yes
+ludic,desktop,ludic_desktop.webp,1920,1080,244546,88344f52cce419d7,yes
+ludic,mobile,ludic_mobile.webp,1080,1920,193416,9cec7935f1e1a68d,yes
+design,desktop,design_desktop.webp,1920,1080,230516,13f513e109b10cb6,yes
+design,mobile,design_mobile.webp,1080,1920,186980,4ac302041359576a,yes
+thank_you,desktop,thank_you_desktop.webp,1920,1080,240098,2465e127225017a5,yes
+thank_you,mobile,thank_you_mobile.webp,1080,1920,203666,0f16c549d0ca86a5,yes

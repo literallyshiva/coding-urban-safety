@@ -77,7 +77,7 @@ class _DesignResponsePageState extends State<DesignResponsePage> {
   Widget build(BuildContext context) {
     final state = widget.assessmentState;
     return ResearchScaffold(
-      illustration: 'assets/images/illustrated/10_design.webp',
+      illustration: 'assets/images/illustrated/design_desktop.webp',
       sectionLabel: 'DESIGN IDEAS',
       bottomButton: PrimaryActionButton(
         label: 'REVIEW & SUBMIT',

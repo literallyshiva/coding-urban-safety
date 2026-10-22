@@ -34,7 +34,6 @@ class ResearchScaffold extends StatelessWidget {
       ),
       body: SafeArea(
         child: LayoutBuilder(builder: (context, bounds) {
-          final desktop = hasArt && bounds.maxWidth >= 1000;
           if (hasArt) {
             return _ImmersiveSafetyLayout(
               illustration: illustration!, sectionLabel: sectionLabel,
@@ -42,8 +41,7 @@ class ResearchScaffold extends StatelessWidget {
               bottomButton: bottomButton,
             );
           }
-          if (!hasArt) {
-            return Column(children: [
+          return Column(children: [
               Expanded(child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 28, 20, 40),
                 child: Center(child: ConstrainedBox(
@@ -53,64 +51,6 @@ class ResearchScaffold extends StatelessWidget {
               )),
               if (bottomButton != null) _BottomAction(child: bottomButton!),
             ]);
-          }
-          if (desktop) {
-            return Row(children: [
-              Expanded(flex: 46, child: _IllustratedScene(
-                asset: illustration!, section: sectionLabel,
-                showLabel: true,
-              )),
-              Expanded(flex: 54, child: Column(children: [
-                Expanded(child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(40, 34, 40, 40),
-                  child: Center(child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 720),
-                    child: _ResearchPanel(child: child),
-                  )),
-                )),
-                if (bottomButton != null) _BottomAction(
-                  child: Center(child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 720),
-                    child: bottomButton!,
-                  )),
-                ),
-              ])),
-            ]);
-          }
-          // Mobile: full-bleed illustrated scene behind the actual form.
-          // The picture remains visible above and around the questionnaire,
-          // rather than being cropped into a fixed-height horizontal banner.
-          return Stack(children: [
-            Positioned.fill(child: _IllustratedScene(
-              asset: illustration!, section: sectionLabel, showLabel: false,
-            )),
-            Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  colors.surface.withValues(alpha: .10),
-                  colors.surface.withValues(alpha: .52),
-                ],
-                stops: const [0, .35, 1],
-              ),
-            ))),
-            Column(children: [
-              Expanded(child: SingleChildScrollView(
-                child: Column(children: [
-                  SizedBox(height: bounds.maxHeight < 650 ? 130 : 195),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 28),
-                    child: _ResearchPanel(child: child),
-                  ),
-                ]),
-              )),
-              if (bottomButton != null) _BottomAction(child: bottomButton!),
-            ]),
-            if (sectionLabel != null)
-              Positioned(top: 14, left: 14, child: _SceneLabel(sectionLabel!)),
-          ]);
         }),
       ),
     );
@@ -120,10 +60,8 @@ class ResearchScaffold extends StatelessWidget {
 
 String _responsiveIllustration(String desktopAsset, bool desktop) {
   if (desktop) return desktopAsset;
-  // Use a dedicated mobile asset only when it is supplied by the project.
-  // Do not assume the older converted PNGs have mobile counterparts.
-  if (desktopAsset.endsWith('/safety_street_desktop.webp')) {
-    return 'assets/images/illustrated/safety_street_mobile.webp';
+  if (desktopAsset.endsWith('_desktop.webp')) {
+    return desktopAsset.replaceFirst('_desktop.webp', '_mobile.webp');
   }
   return desktopAsset;
 }

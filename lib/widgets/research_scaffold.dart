@@ -22,7 +22,7 @@ class ResearchScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final illustrated = illustration != null;
+    final hasArt = illustration != null;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colors.surface,
@@ -30,99 +30,169 @@ class ResearchScaffold extends StatelessWidget {
           fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: .8)),
         actions: const [AppSettingsButton()],
       ),
-      body: SafeArea(child: Column(children: [
-        Expanded(child: SingleChildScrollView(
-          child: Column(children: [
-            if (illustrated)
-              _IllustratedBanner(asset: illustration!, section: sectionLabel),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, illustrated ? 0 : 24, 16, 32),
-              child: Center(child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
-                child: illustrated
-                  ? Transform.translate(
-                      offset: const Offset(0, -26),
-                      child: _EditorialPaper(child: child),
-                    )
-                  : child,
+      body: SafeArea(
+        child: LayoutBuilder(builder: (context, bounds) {
+          final desktop = hasArt && bounds.maxWidth >= 1000;
+          if (!hasArt) {
+            return Column(children: [
+              Expanded(child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 40),
+                child: Center(child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 760),
+                  child: child,
+                )),
               )),
-            ),
-          ]),
-        )),
-        if (bottomButton != null)
-          Container(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
-            decoration: BoxDecoration(
-              color: colors.surface,
-              border: Border(top: BorderSide(color: colors.outlineVariant)),
-              boxShadow: [BoxShadow(
-                color: colors.shadow.withValues(alpha: .08),
-                blurRadius: 18, offset: const Offset(0, -5))],
-            ),
-            child: SafeArea(top: false, child: bottomButton!),
-          ),
-      ])),
+              if (bottomButton != null) _BottomAction(child: bottomButton!),
+            ]);
+          }
+          if (desktop) {
+            return Row(children: [
+              Expanded(flex: 46, child: _IllustratedScene(
+                asset: illustration!, section: sectionLabel,
+                showLabel: true,
+              )),
+              Expanded(flex: 54, child: Column(children: [
+                Expanded(child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(40, 34, 40, 40),
+                  child: Center(child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: _ResearchPanel(child: child),
+                  )),
+                )),
+                if (bottomButton != null) _BottomAction(
+                  child: Center(child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: bottomButton!,
+                  )),
+                ),
+              ])),
+            ]);
+          }
+          // Mobile: full-bleed illustrated scene behind the actual form.
+          // The picture remains visible above and around the questionnaire,
+          // rather than being cropped into a fixed-height horizontal banner.
+          return Stack(children: [
+            Positioned.fill(child: _IllustratedScene(
+              asset: illustration!, section: sectionLabel, showLabel: false,
+            )),
+            Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  colors.surface.withValues(alpha: .10),
+                  colors.surface.withValues(alpha: .52),
+                ],
+                stops: const [0, .35, 1],
+              ),
+            ))),
+            Column(children: [
+              Expanded(child: SingleChildScrollView(
+                child: Column(children: [
+                  SizedBox(height: bounds.maxHeight < 650 ? 130 : 195),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 28),
+                    child: _ResearchPanel(child: child),
+                  ),
+                ]),
+              )),
+              if (bottomButton != null) _BottomAction(child: bottomButton!),
+            ]),
+            if (sectionLabel != null)
+              Positioned(top: 14, left: 14, child: _SceneLabel(sectionLabel!)),
+          ]);
+        }),
+      ),
     );
   }
 }
 
-class _IllustratedBanner extends StatelessWidget {
-  const _IllustratedBanner({required this.asset, this.section});
+class _IllustratedScene extends StatelessWidget {
+  const _IllustratedScene({
+    required this.asset, this.section, required this.showLabel,
+  });
   final String asset;
   final String? section;
+  final bool showLabel;
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final height = screenWidth < 600 ? 310.0 : 360.0;
     return Semantics(
-      label: 'Illustrated urban public space',
+      label: 'Illustration of an urban public space',
       image: true,
-      child: SizedBox(
-        height: height,
-        width: double.infinity,
-        child: Stack(fit: StackFit.expand, children: [
-          Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center),
-          DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.transparent, colors.surface.withValues(alpha: .06),
-              colors.surface.withValues(alpha: .82)],
-            stops: const [0, .68, 1],
-          ))),
-          if (section != null)
-            Positioned(left: 20, top: 20, child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(color: colors.surface.withValues(alpha: .95),
-                borderRadius: BorderRadius.circular(30)),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.location_on_outlined, color: colors.primary, size: 17),
-                const SizedBox(width: 6),
-                Text(section!, style: TextStyle(fontSize: 11, letterSpacing: 1,
-                  fontWeight: FontWeight.w900, color: colors.onSurface)),
-              ]),
-            )),
+      child: Stack(fit: StackFit.expand, children: [
+        Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center),
+        if (showLabel && section != null)
+          Positioned(top: 24, left: 24, child: _SceneLabel(section!)),
+      ]),
+    );
+  }
+}
+
+class _SceneLabel extends StatelessWidget {
+  const _SceneLabel(this.label);
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: .94),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.place_outlined, size: 15,
+            color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(
+            fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
         ]),
       ),
     );
   }
 }
 
-class _EditorialPaper extends StatelessWidget {
-  const _EditorialPaper({required this.child});
+class _ResearchPanel extends StatelessWidget {
+  const _ResearchPanel({required this.child});
   final Widget child;
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 25, 20, 27),
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 28),
       decoration: BoxDecoration(
-        color: colors.surface,
+        color: colors.surface.withValues(alpha: .97),
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: .65)),
-        boxShadow: [BoxShadow(color: colors.shadow.withValues(alpha: .1),
-          blurRadius: 25, offset: const Offset(0, 10))],
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: .6)),
+        boxShadow: [BoxShadow(
+          color: colors.shadow.withValues(alpha: .12),
+          blurRadius: 28, offset: const Offset(0, 10),
+        )],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _BottomAction extends StatelessWidget {
+  const _BottomAction({required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      decoration: BoxDecoration(
+        color: colors.surface.withValues(alpha: .97),
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
+        boxShadow: [BoxShadow(
+          color: colors.shadow.withValues(alpha: .09),
+          blurRadius: 16, offset: const Offset(0, -4),
+        )],
       ),
       child: child,
     );
